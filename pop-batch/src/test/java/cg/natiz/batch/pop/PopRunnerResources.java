@@ -15,16 +15,23 @@
  */
 package cg.natiz.batch.pop;
 
+import java.text.MessageFormat;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+
 import javax.enterprise.inject.Produces;
-
-
+import javax.enterprise.inject.spi.InjectionPoint;
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import cg.natiz.batch.pop.IncomingWorker;
-import cg.natiz.batch.pop.OutcomingWorker;
-import cg.natiz.batch.pop.Pop;
-import cg.natiz.batch.pop.ProcessorWorker;
-import cg.natiz.batch.pop.Repository;
+import cg.natiz.batch.pop.util.Controller;
+import cg.natiz.batch.pop.util.ControllerType;
+import cg.natiz.batch.pop.util.PopConfiguration;
+import cg.natiz.batch.pop.util.Property;
+import cg.natiz.batch.pop.util.Savings;
+import cg.natiz.batch.pop.util.Processor;
+import cg.natiz.batch.pop.util.Puller;
+import cg.natiz.batch.pop.util.Pusher;
 
 /**
  * 
@@ -33,38 +40,60 @@ import cg.natiz.batch.pop.Repository;
  */
 public class PopRunnerResources {
 
-	@Named
-	@Produces
-	@SuppressWarnings("unchecked")
-	Repository<String> getIncoming() {
-		return Pop.newInstance(Repository.class);
-	}
+	@Inject
+	@Savings
+	@Controller(ControllerType.PROVIDER)
+	private Puller<String> sender;
+	@Inject
+	@Savings
+	@Controller(ControllerType.PROCESSOR)
+	private Processor<String, Long> processor;
+	@Inject
+	@Savings
+	@Controller(ControllerType.CONSUMER)
+	private Pusher<Long> recipient;
 
 	@Named
 	@Produces
 	@SuppressWarnings("unchecked")
-	Repository<Long> getOutcoming() {
-		return Pop.newInstance(Repository.class);
+	Pop<String, Long> getPop() {
+		Pop<String, Long> pop = Pop.newInstance(Pop.class).setProvider(sender)
+				.setConsumer(recipient).setProcessor(processor);
+		return pop;
 	}
 
-	@Named
 	@Produces
-	@SuppressWarnings("unchecked")
-	IncomingWorker<String> getIncomingWorker() {
-		return Pop.newInstance(IncomingWorker.class);
-	}
+	@Property
+	public String injectProperty(InjectionPoint ip)
+			throws IllegalStateException {
 
-	@Named
-	@Produces
-	@SuppressWarnings("unchecked")
-	ProcessorWorker<String, Long> getProcessorWorker() {
-		return Pop.newInstance(ProcessorWorker.class);
-	}
+		final String MANDATORY_PARAM_MISSING = "No definition found for a mandatory"
+				+ " configuration parameter : %s";
+		PopConfiguration config = PopRunner.class
+				.getAnnotation(PopConfiguration.class);
+		Property param = ip.getAnnotated().getAnnotation(Property.class);
+		if (param.key() == null || param.key().isEmpty()) {
+			return param.defaultValue();
+		}
+		String value;
+		try {
 
-	@Named
-	@Produces
-	@SuppressWarnings("unchecked")
-	OutcomingWorker<Long> getOutcomingWorker() {
-		return Pop.newInstance(OutcomingWorker.class);
+			ResourceBundle bundle = ResourceBundle.getBundle(config.value()[0]);
+			value = bundle.getString(param.key());
+			if (value == null || value.trim().length() == 0) {
+				if (param.mandatory())
+					throw new IllegalStateException(MessageFormat.format(
+							MANDATORY_PARAM_MISSING, param.key()));
+				else
+					return param.defaultValue();
+			}
+			return value;
+		} catch (MissingResourceException e) {
+			if (param.mandatory())
+				throw new IllegalStateException(String.format(
+						MANDATORY_PARAM_MISSING, param.key()));
+			//return MessageFormat.format("Invalid key %s", param.key());
+			return param.defaultValue();
+		}
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cg.natiz.batch.pop;
+package cg.natiz.batch.pop.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -75,25 +75,25 @@ public class Container<T> implements Serializable {
 		return reference;
 	}
 
-	protected Container<T> setReference(long reference) {
+	public Container<T> setReference(long reference) {
 		this.reference = reference;
 		return this;
 	}
 
-	protected Date getSendDate() {
+	public Date getSendDate() {
 		return sendDate;
 	}
 
-	protected Container<T> setSendDate(Date sendDate) {
+	public Container<T> setSendDate(Date sendDate) {
 		this.sendDate = sendDate;
 		return this;
 	}
 
-	protected Date getStartProcessDate() {
+	public Date getStartProcessDate() {
 		return startProcessDate;
 	}
 
-	protected Container<T> setStartProcessDate(Date startProcessDate) {
+	public Container<T> setStartProcessDate(Date startProcessDate) {
 		this.startProcessDate = startProcessDate;
 		return this;
 	}
@@ -102,7 +102,7 @@ public class Container<T> implements Serializable {
 		return endProcessDate;
 	}
 
-	protected Container<T> setEndProcessDate(Date endProcessDate) {
+	public Container<T> setEndProcessDate(Date endProcessDate) {
 		this.endProcessDate = endProcessDate;
 		return this;
 	}
@@ -111,7 +111,7 @@ public class Container<T> implements Serializable {
 		return receiptDate;
 	}
 
-	protected Container<T> setReceiptDate(Date receiptDate) {
+	public Container<T> setReceiptDate(Date receiptDate) {
 		this.receiptDate = receiptDate;
 		return this;
 	}

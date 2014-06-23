@@ -5,7 +5,6 @@ package cg.natiz.batch.pop.util;
 
 import java.io.Serializable;
 
-import cg.natiz.batch.pop.Container;
 
 
 /**
@@ -24,6 +23,6 @@ public interface Pusher<T extends Serializable> extends Serializable {
 	 * @throws Exception
 	 *             if the push operation fails
 	 */
-	public boolean push(Container<T> container) throws Exception;
+	public boolean push(final Container<T> container) throws Exception;
 
 }

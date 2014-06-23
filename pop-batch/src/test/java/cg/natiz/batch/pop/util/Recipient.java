@@ -4,11 +4,9 @@
 package cg.natiz.batch.pop.util;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.slf4j.Logger;
 
-import cg.natiz.batch.pop.Container;
 import cg.natiz.batch.pop.util.Pusher;
 
 /**
@@ -16,7 +14,8 @@ import cg.natiz.batch.pop.util.Pusher;
  * 
  */
 @SuppressWarnings("serial")
-@Named("recipient")
+@Controller(ControllerType.CONSUMER)
+@Savings
 public class Recipient implements Pusher<Long> {
 
 	@Inject

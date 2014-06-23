@@ -1,4 +1,4 @@
-package cg.natiz.batch.pop;
+package cg.natiz.batch.pop.util;
 
 import java.io.Serializable;
 import java.util.concurrent.BlockingQueue;
@@ -11,8 +11,6 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import cg.natiz.batch.pop.util.Poller;
-import cg.natiz.batch.pop.util.Pusher;
 
 
 /**
@@ -25,10 +23,10 @@ import cg.natiz.batch.pop.util.Pusher;
  */
 @SuppressWarnings("serial")
 public class Repository<T extends Serializable> implements Serializable,
-		Poller<T>, Pusher<T> {
+		Puller<T>, Pusher<T> {
 
 	public static final int DEFAULT_QUEUE_TIMEOUT = 200; // millisecond
-	private static final int DEFAULT_THREAD_SLEEP_TIME = 5; // millisecond
+
 	@Inject
 	private static Logger logger;
 
@@ -36,8 +34,6 @@ public class Repository<T extends Serializable> implements Serializable,
 			50);
 	private AtomicBoolean closing = new AtomicBoolean(false);
 	private AtomicLong reference = new AtomicLong(0);
-	/* Minimum length of time in milliseconds to make a thread sleeping */
-	private int threadSleep = DEFAULT_THREAD_SLEEP_TIME;
 
 	/**
 	 * The repository is closed or not
@@ -70,21 +66,12 @@ public class Repository<T extends Serializable> implements Serializable,
 		return reference.incrementAndGet();
 	}
 
-	public int getThreadSleep() {
-		return threadSleep;
-	}
-
-	public Repository<T> setThreadSleep(int threadSleep) {
-		this.threadSleep = threadSleep;
-		return this;
-	}
-
 	public int size() {
 		return this.store.size();
 	}
 
 	@Override
-	public Container<T> poll() throws InterruptedException {
+	public Container<T> pull() throws InterruptedException {
 		return this.store.poll(DEFAULT_QUEUE_TIMEOUT, TimeUnit.MILLISECONDS);
 	}
 

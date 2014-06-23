@@ -4,34 +4,35 @@
 package cg.natiz.batch.pop.util;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.slf4j.Logger;
 
-import cg.natiz.batch.pop.Container;
-import cg.natiz.batch.pop.util.Poller;
+import cg.natiz.batch.pop.util.Puller;
 
 /**
  * @author natiz
  * 
  */
 @SuppressWarnings("serial")
-@Named("sender")
-public class Sender implements Poller<String> {
+@Controller(ControllerType.PROVIDER)
+@Savings
+public class Sender implements Puller<String> {
+	
 	private static final Random rand = new Random();
 	private static final int maxCount = 1000;
-	private static final int size = 1000;
+	private static final int size = 100;
 
-	private static int count = 0;
+	private static AtomicInteger count = new AtomicInteger(0);
 
 	@Inject
 	private Logger logger;
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Container<String> poll() throws Exception {
+	public Container<String> pull() throws Exception {
 
 		if (!hasMoreData()) {
 			logger.info("Meaning no data anymore");
@@ -41,18 +42,18 @@ public class Sender implements Poller<String> {
 		String token = null;
 		for (int i = 0; i < size; i++) {
 			token = "" + rand.nextInt(size);
-			if (count == 5 && i == 5) {
+			if (count.get() == 5 && i == 5) {
 				logger.info("Adding wrong data, this item will be rejected");
 				token += "A";
 			}
 			container.add(token);
 		}
-		count++;
+		count.incrementAndGet();
 		return container;
 	}
 
 	private boolean hasMoreData() {
-		return count < maxCount;
+		return count.get() < maxCount;
 	}
 
 }

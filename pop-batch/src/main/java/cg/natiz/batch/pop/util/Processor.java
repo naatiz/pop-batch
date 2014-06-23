@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author natiz
  * 
  */
-public interface Processor<T1, T2> extends Serializable {
+public interface Processor<T1 extends Serializable, T2 extends Serializable> extends Serializable {
 
 	/**
 	 * Process the received entity T1 and generate a new one T2
@@ -19,5 +19,5 @@ public interface Processor<T1, T2> extends Serializable {
 	 * @return an other processed entity
 	 * @throws Exception if the operation fails
 	 */
-	public T2 doProcess(T1 entity) throws Exception;
+	public T2 process(final T1 entity) throws Exception;
 }
