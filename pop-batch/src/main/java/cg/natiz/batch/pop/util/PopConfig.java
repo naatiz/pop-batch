@@ -15,7 +15,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Target({TYPE, METHOD, FIELD, PARAMETER})
 @Qualifier
 @Retention(RUNTIME)
-public @interface PopConfiguration {
+public @interface PopConfig {
 	@Nonbinding
-	String [] value();
+	String [] value() default {"/pop.cfg"};
 }

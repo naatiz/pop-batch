@@ -27,7 +27,7 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cg.natiz.batch.pop.util.Cfg;
+import cg.natiz.batch.pop.util.PopProperties;
 import cg.natiz.batch.pop.util.Puller;
 import cg.natiz.batch.pop.util.Processor;
 import cg.natiz.batch.pop.util.Pusher;
@@ -41,18 +41,13 @@ import cg.natiz.batch.pop.util.Repository;
 @SuppressWarnings("serial")
 public class Pop<T1 extends Serializable, T2 extends Serializable> implements
 		Serializable {
+	private static final Logger logger = LoggerFactory.getLogger(Pop.class);;
 
-	private static final Logger logger = LoggerFactory.getLogger(Pop.class);
-	private Cfg cfg;
 	private Puller<T1> provider;
 	private Processor<T1, T2> processor;
 	private Pusher<T2> consumer;
-	private Set<Callable<String>> workers;
 
-	public Pop<T1, T2> setCfg(Cfg cfg) {
-		this.cfg = cfg;
-		return this;
-	}
+	private ExecutorService executorService;
 
 	public Pop<T1, T2> setProvider(Puller<T1> provider) {
 		this.provider = provider;
@@ -70,34 +65,34 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements
 	}
 
 	/**
-	 * Initialize the worker
 	 * 
-	 * @param provider
-	 *            specific PoP provider
-	 * @param processor
-	 *            specific PoP processor
-	 * @param consumer
-	 *            specific PoP consumer
-	 * @return this PoP object
+	 * Execute PoP batch
+	 * 
+	 * @throws Exception
+	 *             if the operation fails
 	 */
 	@SuppressWarnings("unchecked")
-	public Pop<T1, T2> build() {
+	public void execute(PopProperties popProperties,
+			ExecutionOption... executionOptions) throws Exception {
 
 		logger.info("Incoming/Outcoming repositories initializing ... ");
-		Repository<T1> incoming = Pop.newInstance(Repository.class);		
+		Repository<T1> incoming = Pop.newInstance(Repository.class);
 		Repository<T2> outcoming = Pop.newInstance(Repository.class);
 
-		workers = new HashSet<Callable<String>>(cfg.getSizeOfPool());
+		this.executorService = Executors.newFixedThreadPool(popProperties
+				.getPool());
 
+		Set<Callable<String>> workers = new HashSet<Callable<String>>(
+				popProperties.getPool());
 		logger.info("Provider worker initializing ... ");
-		int count = cfg.getNumberOfProviderWorker();
+		int count = popProperties.getProviderWorker();
 		for (int i = 0; i < count; i++) {
 			workers.add(Pop.newInstance(IncomingWorker.class)
 					.setProvider(provider).setIncoming(incoming));
 		}
 
 		logger.info("Processor worker initializing ... ");
-		count = cfg.getNumberOfProcessorWorker();
+		count = popProperties.getProcessorWorker();
 		for (int i = 0; i < count; i++) {
 			workers.add(Pop.newInstance(DispatcherWorker.class)
 					.setProcessor(processor).setIncoming(incoming)
@@ -105,28 +100,11 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements
 		}
 
 		logger.info("Consumer worker initializing ... ");
-		count = cfg.getNumberOfConsumerWorker();
+		count = popProperties.getConsumerWorker();
 		for (int i = 0; i < count; i++) {
 			workers.add(Pop.newInstance(OutcomingWorker.class)
 					.setConsumer(consumer).setOutcoming(outcoming));
 		}
-
-		return this;
-	}
-
-	/**
-	 * 
-	 * Execute PoP batch
-	 * 
-	 * @throws Exception
-	 *             if the operation fails
-	 */
-	public void execute() throws Exception {
-		if (workers == null || workers.isEmpty())
-			throw new Exception("Calling build method is required");
-
-		ExecutorService executorService = Executors.newFixedThreadPool(cfg
-				.getSizeOfPool());
 
 		logger.info("Batch processes start running ... ");
 		List<Future<String>> futures = executorService.invokeAll(workers);

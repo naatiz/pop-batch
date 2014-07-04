@@ -22,8 +22,8 @@ import cg.natiz.batch.pop.util.Puller;
 public class Sender implements Puller<String> {
 	
 	private static final Random rand = new Random();
-	private static final int maxCount = 1000;
-	private static final int size = 100;
+	private static final int maxCount = 100000;
+	private static final int size = 10000;
 
 	private static AtomicInteger count = new AtomicInteger(0);
 

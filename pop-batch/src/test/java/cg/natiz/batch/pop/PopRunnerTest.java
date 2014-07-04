@@ -13,8 +13,8 @@ public class PopRunnerTest {
 	@Test
 	public void execute() {
 		// Revival = relance ou reprise
-		logger.debug("Running options : -R=Reportiong -M=Monitoring -V=Revival ");
-		StartMain.main(new String[] {"-R", "-M", "-V"});
+		logger.debug("Running options : -R=Reporting -M=Monitoring -V=Revival ");
+		StartMain.main(new String[] {"-RMV"});
 		assertTrue(true);
 	}
 }

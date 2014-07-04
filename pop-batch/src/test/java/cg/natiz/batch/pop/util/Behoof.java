@@ -20,7 +20,7 @@ import cg.natiz.batch.pop.util.Processor;
 @SuppressWarnings("serial")
 @Controller(ControllerType.PROCESSOR)
 @Savings
-public class AmountAfterBehoof implements Processor<String, Long> {
+public class Behoof implements Processor<String, Long> {
 
 	@Inject
 	private Logger logger;
