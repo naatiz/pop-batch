@@ -51,7 +51,7 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 	 *            an incoming repository
 	 * @return this worker object
 	 */
-	public DispatcherWorker<T1, T2> setIncoming(Repository<T1> ... incoming) {
+	public DispatcherWorker<T1, T2> setIncoming(@SuppressWarnings("unchecked") Repository<T1> ... incoming) {
 		logger.debug("Setting {} incoming repository(ies)", incoming.length);
 		this.incoming = incoming;
 		return this;
@@ -62,7 +62,7 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 	 *            an outcoming repository
 	 * @return this worker object
 	 */
-	public DispatcherWorker<T1, T2> setOutcoming(Repository<T2> ... outcoming) {
+	public DispatcherWorker<T1, T2> setOutcoming(@SuppressWarnings("unchecked") Repository<T2> ... outcoming) {
 		logger.debug("Setting {} outcoming repository(ies)", outcoming.length);
 		this.outcoming = outcoming;
 		return this;
@@ -94,8 +94,8 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 				}
 				if (!processedContent.isEmpty()) {
 					@SuppressWarnings("unchecked")
-					Container<T2> newContainer = Container
-							.newInstance(Container.class);
+					Container<T2> newContainer = Container.newInstance(
+							Container.class);
 					if (outcoming[0].push(newContainer
 							.setReference(outcoming[0].getReference())
 							.setSendDate(container.getSendDate())

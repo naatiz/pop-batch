@@ -41,7 +41,7 @@ import cg.natiz.batch.pop.util.Repository;
 @SuppressWarnings("serial")
 public class Pop<T1 extends Serializable, T2 extends Serializable> implements
 		Serializable {
-	private static final Logger logger = LoggerFactory.getLogger(Pop.class);;
+	private static final Logger logger = LoggerFactory.getLogger(Pop.class);
 
 	private Puller<T1> provider;
 	private Processor<T1, T2> processor;

@@ -7,11 +7,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-
-
 
 /**
  * 
@@ -26,9 +21,6 @@ public class Repository<T extends Serializable> implements Serializable,
 		Puller<T>, Pusher<T> {
 
 	public static final int DEFAULT_QUEUE_TIMEOUT = 200; // millisecond
-
-	@Inject
-	private static Logger logger;
 
 	private BlockingQueue<Container<T>> store = new LinkedBlockingQueue<Container<T>>(
 			50);

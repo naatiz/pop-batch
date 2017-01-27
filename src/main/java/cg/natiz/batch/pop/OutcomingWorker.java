@@ -23,9 +23,10 @@ import cg.natiz.batch.pop.util.Repository;
  *            outcoming managed data type
  */
 public class OutcomingWorker<T extends Serializable> implements Callable<String> {
-
+	
 	private static final Logger logger = LoggerFactory
 			.getLogger(OutcomingWorker.class);
+	
 	private Pusher<T> consumer;
 	protected Repository<T>[] outcoming;
 
@@ -34,7 +35,7 @@ public class OutcomingWorker<T extends Serializable> implements Callable<String>
 	 *            an outcoming repository
 	 * @return this worker object
 	 */
-	public OutcomingWorker<T> setOutcoming(Repository<T> ... outcoming) {
+	public OutcomingWorker<T> setOutcoming(@SuppressWarnings("unchecked") Repository<T> ... outcoming) {
 		logger.debug("Setting {} outcoming repository(ies)", outcoming.length);
 		this.outcoming = outcoming;
 		return this;

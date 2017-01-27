@@ -33,7 +33,7 @@ public class IncomingWorker<T extends Serializable> implements Callable<String> 
 	 *            an incoming repository
 	 * @return this worker object
 	 */
-	public IncomingWorker<T> setIncoming(Repository<T> ... incoming) {
+	public IncomingWorker<T> setIncoming(@SuppressWarnings("unchecked") Repository<T> ... incoming) {
 		logger.debug("Setting {} incoming repository(ies)", incoming.length);
 		this.incoming = incoming;
 		return this;

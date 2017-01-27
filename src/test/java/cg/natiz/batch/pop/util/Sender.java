@@ -3,7 +3,7 @@
  */
 package cg.natiz.batch.pop.util;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -21,9 +21,8 @@ import cg.natiz.batch.pop.util.Puller;
 @Savings
 public class Sender implements Puller<String> {
 	
-	private static final Random rand = new Random();
-	private static final int maxCount = 100000;
-	private static final int size = 10000;
+	private static final int maxCount = 1000;
+	private static final int size = 100;
 
 	private static AtomicInteger count = new AtomicInteger(0);
 
@@ -41,7 +40,7 @@ public class Sender implements Puller<String> {
 		Container<String> container = Container.newInstance(Container.class);
 		String token = null;
 		for (int i = 0; i < size; i++) {
-			token = "" + rand.nextInt(size);
+			token = "" + ThreadLocalRandom.current().nextInt(size);
 			if (count.get() == 5 && i == 5) {
 				logger.info("Adding wrong data, this item will be rejected");
 				token += "A";
