@@ -9,7 +9,6 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cg.natiz.batch.pop.util.Container;
 import cg.natiz.batch.pop.util.Controller;
 import cg.natiz.batch.pop.util.ControllerType;
 import cg.natiz.batch.pop.util.Processor;
@@ -89,12 +88,12 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 						logger.warn(
 								"Container data processing fails: {}  \nRelated : {}",
 								data, container);
-						logger.warn("Container item processing fails", e);
+						logger.warn("Container item processing fails : {}", e.getMessage());
 					}
 				}
 				if (!processedContent.isEmpty()) {
 					@SuppressWarnings("unchecked")
-					Container<T2> newContainer = Container.newInstance(
+					Container<T2> newContainer = Pop.newInstance(
 							Container.class);
 					if (outcoming[0].push(newContainer
 							.setReference(outcoming[0].getReference())

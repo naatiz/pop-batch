@@ -5,6 +5,8 @@ package cg.natiz.batch.pop.util;
 
 import java.io.Serializable;
 
+import cg.natiz.batch.pop.Container;
+
 
 
 /**

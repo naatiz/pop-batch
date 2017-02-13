@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cg.natiz.batch.pop.util;
+package cg.natiz.batch.pop;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,19 +24,7 @@ public class Container<T> implements Serializable {
 	private Date endProcessDate;
 
 	private List<T> content = new ArrayList<T>(100);
-
-	@SuppressWarnings("rawtypes")
-	public static <T1 extends Container> T1 newInstance(Class<T1> clazz) {
-		try {
-			return clazz.newInstance();
-		} catch (InstantiationException e) {
-			throw new IllegalStateException("Container instanciation failed",
-					e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalStateException("Container access failed", e);
-		}
-	}
-
+	
 	protected Container() {
 	}
 

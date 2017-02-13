@@ -16,35 +16,35 @@ public class PopProperties implements Serializable {
 	private static final Logger logger = LoggerFactory
 			.getLogger(PopProperties.class);
 
-	int providerWorker = 1;
-	int processorWorker = 1;
-	int consumerWorker = 1;
+	int providerWorkerCount = 1;
+	int processorWorkerCount = 1;
+	int consumerWorkerCount = 1;
 
 	public int getPool() {
-		int pool = getProviderWorker();
-		pool += getProcessorWorker();
-		pool += getConsumerWorker();
+		int pool = getProviderWorkerCount();
+		pool += getProcessorWorkerCount();
+		pool += getConsumerWorkerCount();
 		return pool;
 	}
 
-	public int getProviderWorker() {
-		return Math.max(1, providerWorker);
+	public int getProviderWorkerCount() {
+		return Math.max(1, providerWorkerCount);
 	}
 
-	public int getProcessorWorker() {
-		return Math.max(1, processorWorker);
+	public int getProcessorWorkerCount() {
+		return Math.max(1, processorWorkerCount);
 	}
 
-	public int getConsumerWorker() {
-		return Math.max(1, consumerWorker);
+	public int getConsumerWorkerCount() {
+		return Math.max(1, consumerWorkerCount);
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("PopProperties [providerWorker=")
-				.append(providerWorker).append(", processorWorker=")
-				.append(processorWorker).append(", consumerWorker=")
-				.append(consumerWorker).append(", pool=").append(getPool())
+		StringBuilder sb = new StringBuilder("PopProperties [providerWorkerCount=")
+				.append(providerWorkerCount).append(", processorWorkerCount=")
+				.append(processorWorkerCount).append(", consumerWorkerCount=")
+				.append(consumerWorkerCount).append(", pool=").append(getPool())
 				.append("]");
 		return sb.toString();
 	}
@@ -52,17 +52,17 @@ public class PopProperties implements Serializable {
 	public PopProperties loadPrperties(String ...path) {
 		InputStream in = null;
 		try {
-			logger.info("Loading pop properties from the file : " + path[0]);
+			logger.info("Loading pop properties from the file : " + this.getClass().getClassLoader().getResource(path[0]));
 			in = this.getClass().getClassLoader().getResourceAsStream(path[0]);
 			Properties properties = new Properties();
 			properties.load(in);
 
-			providerWorker = Integer.valueOf(properties.getProperty(
-					"provider.worker", "1"));
-			processorWorker = Integer.valueOf(properties.getProperty(
-					"processor.worker", "1"));
-			consumerWorker = Integer.valueOf(properties.getProperty(
-					"consumer.worker", "1"));
+			providerWorkerCount = Integer.valueOf(properties.getProperty(
+					"provider.worker.count", "1"));
+			processorWorkerCount = Integer.valueOf(properties.getProperty(
+					"processor.worker.count", "1"));
+			consumerWorkerCount = Integer.valueOf(properties.getProperty(
+					"consumer.worker.count", "1"));
 
 		} catch (Exception e) {
 			logger.warn("Cannot load the properties file : " + path[0], e);

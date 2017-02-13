@@ -85,14 +85,14 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements
 		Set<Callable<String>> workers = new HashSet<Callable<String>>(
 				popProperties.getPool());
 		logger.info("Provider worker initializing ... ");
-		int count = popProperties.getProviderWorker();
+		int count = popProperties.getProviderWorkerCount();
 		for (int i = 0; i < count; i++) {
 			workers.add(Pop.newInstance(IncomingWorker.class)
 					.setProvider(provider).setIncoming(incoming));
 		}
 
 		logger.info("Processor worker initializing ... ");
-		count = popProperties.getProcessorWorker();
+		count = popProperties.getProcessorWorkerCount();
 		for (int i = 0; i < count; i++) {
 			workers.add(Pop.newInstance(DispatcherWorker.class)
 					.setProcessor(processor).setIncoming(incoming)
@@ -100,19 +100,19 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements
 		}
 
 		logger.info("Consumer worker initializing ... ");
-		count = popProperties.getConsumerWorker();
+		count = popProperties.getConsumerWorkerCount();
 		for (int i = 0; i < count; i++) {
 			workers.add(Pop.newInstance(OutcomingWorker.class)
 					.setConsumer(consumer).setOutcoming(outcoming));
 		}
 
-		logger.info("Batch processes start running ... ");
+		logger.info("PoP workers start running ... ");
 		List<Future<String>> futures = executorService.invokeAll(workers);
 		for (Future<String> future : futures) {
-			logger.info(future.get());
+			logger.debug(future.get());
 		}
 		executorService.shutdown();
-		logger.info("Batch processes ended running ... ");
+		logger.info("PoP workers end running successfully");
 	}
 
 	/**

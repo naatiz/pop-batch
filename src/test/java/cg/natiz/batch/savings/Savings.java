@@ -1,4 +1,4 @@
-package cg.natiz.batch.pop.util;
+package cg.natiz.batch.savings;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
