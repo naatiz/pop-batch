@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import cg.natiz.batch.pop.util.Controller;
 import cg.natiz.batch.pop.util.ControllerType;
-import cg.natiz.batch.pop.util.Pusher;
-import cg.natiz.batch.pop.util.Repository;
 
 /**
  * 
@@ -22,10 +20,9 @@ import cg.natiz.batch.pop.util.Repository;
  *            outcoming managed data type
  */
 public class OutcomingWorker<T extends Serializable> implements Callable<String> {
-	
-	private static final Logger logger = LoggerFactory
-			.getLogger(OutcomingWorker.class);
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(OutcomingWorker.class);
+
 	private Pusher<T> consumer;
 	protected Repository<T>[] outcoming;
 
@@ -34,7 +31,7 @@ public class OutcomingWorker<T extends Serializable> implements Callable<String>
 	 *            an outcoming repository
 	 * @return this worker object
 	 */
-	public OutcomingWorker<T> setOutcoming(@SuppressWarnings("unchecked") Repository<T> ... outcoming) {
+	public OutcomingWorker<T> setOutcoming(@SuppressWarnings("unchecked") Repository<T>... outcoming) {
 		logger.debug("Setting {} outcoming repository(ies)", outcoming.length);
 		this.outcoming = outcoming;
 		return this;
@@ -45,8 +42,7 @@ public class OutcomingWorker<T extends Serializable> implements Callable<String>
 	 *            a processed data consumer
 	 * @return this worker object
 	 */
-	public OutcomingWorker<T> setConsumer(
-			@Controller(ControllerType.CONSUMER) Pusher<T> consumer) {
+	public OutcomingWorker<T> setConsumer(@Controller(ControllerType.CONSUMER) Pusher<T> consumer) {
 		this.consumer = consumer;
 		return this;
 	}
@@ -69,8 +65,7 @@ public class OutcomingWorker<T extends Serializable> implements Callable<String>
 				current = container;
 			}
 		}
-		StringBuilder sb = new StringBuilder()
-				.append(this.getClass().getSimpleName()).append(" : ")
+		StringBuilder sb = new StringBuilder().append(this.getClass().getSimpleName()).append(" : ")
 				.append(current.toString());
 		return sb.toString();
 	}

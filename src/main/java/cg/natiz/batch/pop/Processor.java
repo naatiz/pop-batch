@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cg.natiz.batch.pop.util;
+package cg.natiz.batch.pop;
 
 import java.io.Serializable;
 
@@ -17,7 +17,8 @@ public interface Processor<T1 extends Serializable, T2 extends Serializable> ext
 	 * @param entity
 	 *            entity to be processed
 	 * @return an other processed entity
-	 * @throws Exception if the operation fails
+	 * @throws Exception
+	 *             if the operation fails
 	 */
 	public T2 process(final T1 entity) throws Exception;
 }

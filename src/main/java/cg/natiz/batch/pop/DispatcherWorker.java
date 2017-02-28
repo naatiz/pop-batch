@@ -11,13 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import cg.natiz.batch.pop.util.Controller;
 import cg.natiz.batch.pop.util.ControllerType;
-import cg.natiz.batch.pop.util.Processor;
-import cg.natiz.batch.pop.util.Repository;
 
 /**
  * 
- * Control delivered containers from incoming zone, filter, skip, process and transform, then
- * send them the outcoming zone
+ * Control delivered containers from incoming zone, filter, skip, process and
+ * transform, then send them the outcoming zone
  * 
  * @author natiz
  * 
@@ -29,8 +27,7 @@ import cg.natiz.batch.pop.util.Repository;
  */
 public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> implements Callable<String> {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(DispatcherWorker.class);
+	private static final Logger logger = LoggerFactory.getLogger(DispatcherWorker.class);
 	protected Repository<T1>[] incoming;
 	protected Repository<T2>[] outcoming;
 	protected Processor<T1, T2> processor;
@@ -39,8 +36,7 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 	 * @param processor
 	 *            a data processor
 	 */
-	public DispatcherWorker<T1, T2> setProcessor(
-			@Controller(ControllerType.PROCESSOR) Processor<T1, T2> processor) {
+	public DispatcherWorker<T1, T2> setProcessor(@Controller(ControllerType.PROCESSOR) Processor<T1, T2> processor) {
 		this.processor = processor;
 		return this;
 	}
@@ -50,7 +46,7 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 	 *            an incoming repository
 	 * @return this worker object
 	 */
-	public DispatcherWorker<T1, T2> setIncoming(@SuppressWarnings("unchecked") Repository<T1> ... incoming) {
+	public DispatcherWorker<T1, T2> setIncoming(@SuppressWarnings("unchecked") Repository<T1>... incoming) {
 		logger.debug("Setting {} incoming repository(ies)", incoming.length);
 		this.incoming = incoming;
 		return this;
@@ -61,7 +57,7 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 	 *            an outcoming repository
 	 * @return this worker object
 	 */
-	public DispatcherWorker<T1, T2> setOutcoming(@SuppressWarnings("unchecked") Repository<T2> ... outcoming) {
+	public DispatcherWorker<T1, T2> setOutcoming(@SuppressWarnings("unchecked") Repository<T2>... outcoming) {
 		logger.debug("Setting {} outcoming repository(ies)", outcoming.length);
 		this.outcoming = outcoming;
 		return this;
@@ -85,32 +81,24 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 						T2 value = processor.process(data);
 						processedContent.add(value);
 					} catch (Exception e) {
-						logger.warn(
-								"Container data processing fails: {}  \nRelated : {}",
-								data, container);
+						logger.warn("Container data processing fails: {}  \nRelated : {}", data, container);
 						logger.warn("Container item processing fails : {}", e.getMessage());
 					}
 				}
 				if (!processedContent.isEmpty()) {
 					@SuppressWarnings("unchecked")
-					Container<T2> newContainer = Pop.newInstance(
-							Container.class);
-					if (outcoming[0].push(newContainer
-							.setReference(outcoming[0].getReference())
-							.setSendDate(container.getSendDate())
-							.setStartProcessDate(
-									container.getStartProcessDate())
-							.setEndProcessDate(new Date())
-							.addAll(processedContent))) {
+					Container<T2> newContainer = Pop.newInstance(Container.class);
+					if (outcoming[0].push(newContainer.setReference(outcoming[0].getReference())
+							.setSendDate(container.getSendDate()).setStartProcessDate(container.getStartProcessDate())
+							.setEndProcessDate(new Date()).addAll(processedContent))) {
 						logger.debug("Pushed to outcoming {}", newContainer);
 					}
 				}
 				current = container.setEndProcessDate(new Date());
 			}
-		}		
+		}
 		outcoming[0].close();
-		StringBuilder sb = new StringBuilder()
-				.append(this.getClass().getSimpleName()).append(" : ")
+		StringBuilder sb = new StringBuilder().append(this.getClass().getSimpleName()).append(" : ")
 				.append(current.toString());
 		return sb.toString();
 	}

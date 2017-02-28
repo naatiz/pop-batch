@@ -1,4 +1,4 @@
-package cg.natiz.batch.pop.util;
+package cg.natiz.batch.pop;
 
 import java.io.Serializable;
 import java.util.concurrent.BlockingQueue;
@@ -6,9 +6,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-
-import cg.natiz.batch.pop.Container;
-
 
 /**
  * 
@@ -19,13 +16,11 @@ import cg.natiz.batch.pop.Container;
  * 
  */
 @SuppressWarnings("serial")
-public class Repository<T extends Serializable> implements Serializable,
-		Puller<T>, Pusher<T> {
+public class Repository<T extends Serializable> implements Serializable, Puller<T>, Pusher<T> {
 
 	public static final int DEFAULT_QUEUE_TIMEOUT = 200; // millisecond
 
-	private BlockingQueue<Container<T>> store = new LinkedBlockingQueue<Container<T>>(
-			50);
+	private BlockingQueue<Container<T>> store = new LinkedBlockingQueue<Container<T>>(50);
 	private AtomicBoolean closing = new AtomicBoolean(false);
 	private AtomicLong reference = new AtomicLong(0);
 
@@ -71,7 +66,6 @@ public class Repository<T extends Serializable> implements Serializable,
 
 	@Override
 	public boolean push(Container<T> container) throws InterruptedException {
-		return this.store.offer(container, DEFAULT_QUEUE_TIMEOUT,
-				TimeUnit.MILLISECONDS);
+		return this.store.offer(container, DEFAULT_QUEUE_TIMEOUT, TimeUnit.MILLISECONDS);
 	}
 }

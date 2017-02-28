@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import cg.natiz.batch.pop.util.Controller;
 import cg.natiz.batch.pop.util.ControllerType;
-import cg.natiz.batch.pop.util.Puller;
-import cg.natiz.batch.pop.util.Repository;
 
 /**
  * Deliver containers in the incoming zone
@@ -22,8 +20,7 @@ import cg.natiz.batch.pop.util.Repository;
  */
 public class IncomingWorker<T extends Serializable> implements Callable<String> {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(IncomingWorker.class);
+	private static final Logger logger = LoggerFactory.getLogger(IncomingWorker.class);
 	private Puller<T> provider;
 	protected Repository<T>[] incoming;
 
@@ -32,7 +29,7 @@ public class IncomingWorker<T extends Serializable> implements Callable<String> 
 	 *            an incoming repository
 	 * @return this worker object
 	 */
-	public IncomingWorker<T> setIncoming(@SuppressWarnings("unchecked") Repository<T> ... incoming) {
+	public IncomingWorker<T> setIncoming(@SuppressWarnings("unchecked") Repository<T>... incoming) {
 		logger.debug("Setting {} incoming repository(ies)", incoming.length);
 		this.incoming = incoming;
 		return this;
@@ -43,8 +40,7 @@ public class IncomingWorker<T extends Serializable> implements Callable<String> 
 	 *            a data provider
 	 * @return this worker object
 	 */
-	public IncomingWorker<T> setProvider(
-			@Controller(ControllerType.PROVIDER) Puller<T> provider) {
+	public IncomingWorker<T> setProvider(@Controller(ControllerType.PROVIDER) Puller<T> provider) {
 		this.provider = provider;
 		return this;
 	}
@@ -57,19 +53,16 @@ public class IncomingWorker<T extends Serializable> implements Callable<String> 
 		do {
 			logger.debug("Provider waiting for {} ms", waiting);
 			container = provider.pull();
-			if (container != null
-					&& !container.isEmpty()
-					&& incoming[0].push(container.setReference(
-							incoming[0].getReference()).setSendDate(new Date()))) {
+			if (container != null && !container.isEmpty()
+					&& incoming[0].push(container.setReference(incoming[0].getReference()).setSendDate(new Date()))) {
 				current = container;
 				logger.debug("Pushed to incoming {} \nIncoming stock = {}", current, incoming[0].size());
-			}			
+			}
 			Thread.sleep(waiting);
 		} while (container != null);
 		incoming[0].close();
 
-		StringBuilder sb = new StringBuilder()
-				.append(this.getClass().getSimpleName()).append(" : ")
+		StringBuilder sb = new StringBuilder().append(this.getClass().getSimpleName()).append(" : ")
 				.append(current.toString());
 		return sb.toString();
 	}

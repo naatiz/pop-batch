@@ -12,17 +12,25 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 
-@Target({TYPE, METHOD, FIELD, PARAMETER})
+@Target({ TYPE, METHOD, FIELD, PARAMETER })
 @Qualifier
 @Retention(RUNTIME)
 public @interface Property {
 	/**
 	 * Bundle key
 	 * 
-	 * @return a valid bundle key or ""
+	 * @return a valid bundle key or empty string
 	 */
 	@Nonbinding
 	String key() default "";
+
+	/**
+	 * configuration filenames
+	 * 
+	 * @return array of relative filenames
+	 */
+	@Nonbinding
+	String[] src() default { "pop.cfg" };
 
 	/**
 	 * Is it a mandatory property
@@ -35,7 +43,7 @@ public @interface Property {
 	/**
 	 * Default value if not provided
 	 * 
-	 * @return default value or ""
+	 * @return default value or empty string
 	 */
 	@Nonbinding
 	String defaultValue() default "";

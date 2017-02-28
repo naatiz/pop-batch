@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 
 import cg.natiz.batch.pop.Container;
 import cg.natiz.batch.pop.Pop;
+import cg.natiz.batch.pop.Puller;
 import cg.natiz.batch.pop.util.Controller;
 import cg.natiz.batch.pop.util.ControllerType;
-import cg.natiz.batch.pop.util.Puller;
 
 /**
  * @author natiz
@@ -24,11 +24,11 @@ import cg.natiz.batch.pop.util.Puller;
 @Controller(ControllerType.PROVIDER)
 @Savings
 public class Sender implements Puller<String> {
-	
+
 	/* maximum number of containers */
-	private final long MAX_CONTAINER_NUMBER = 1000; 
+	private final long MAX_CONTAINER_NUMBER = 1000;
 	/* maximum number of elements inside a container */
-	private final int MAX_CONTAINER_SIZE = 100; 
+	private final int MAX_CONTAINER_SIZE = 100;
 
 	/* current container number */
 	private final AtomicLong CURRENT_CONTAINER_NUMBER = new AtomicLong(0);
@@ -51,7 +51,7 @@ public class Sender implements Puller<String> {
 			token = "" + ThreadLocalRandom.current().nextInt(MAX_CONTAINER_SIZE);
 			if (CURRENT_CONTAINER_NUMBER.get() == 5 && i == 5) {
 				token += "A";
-				logger.warn("Adding wrong data {}, this {} will be rejected", token, container);		
+				logger.warn("Adding wrong data {}, this {} will be rejected", token, container);
 			}
 			container.add(token);
 		}

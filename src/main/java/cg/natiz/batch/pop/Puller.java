@@ -1,13 +1,9 @@
 /**
  * 
  */
-package cg.natiz.batch.pop.util;
+package cg.natiz.batch.pop;
 
 import java.io.Serializable;
-
-import cg.natiz.batch.pop.Container;
-
-
 
 /**
  * @author natiz

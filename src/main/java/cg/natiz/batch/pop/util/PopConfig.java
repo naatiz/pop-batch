@@ -12,10 +12,16 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.lang.annotation.ElementType.PARAMETER;
 
-@Target({TYPE, METHOD, FIELD, PARAMETER})
+@Target({ TYPE, METHOD, FIELD, PARAMETER })
 @Qualifier
 @Retention(RUNTIME)
 public @interface PopConfig {
+
+	/**
+	 * configuration filenames
+	 * 
+	 * @return array of relative filenames
+	 */
 	@Nonbinding
-	String [] value() default {"/pop.cfg"};
+	String[] value() default { "/pop.cfg" };
 }

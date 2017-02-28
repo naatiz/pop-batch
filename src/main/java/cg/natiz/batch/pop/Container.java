@@ -24,7 +24,7 @@ public class Container<T> implements Serializable {
 	private Date endProcessDate;
 
 	private List<T> content = new ArrayList<T>(100);
-	
+
 	protected Container() {
 	}
 
@@ -129,13 +129,10 @@ public class Container<T> implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer().append("Container [Reference=")
-				.append(getReference()).append(", SendDate=")
-				.append(getSendDate()).append(", StartProcessDate=")
-				.append(getStartProcessDate()).append(", EndProcessDate=")
-				.append(getEndProcessDate()).append(", ReceiptDate=")
-				.append(getReceiptDate()).append(", size=").append(size())
-				.append("]");
+		StringBuffer sb = new StringBuffer().append("Container [Reference=").append(getReference())
+				.append(", SendDate=").append(getSendDate()).append(", StartProcessDate=").append(getStartProcessDate())
+				.append(", EndProcessDate=").append(getEndProcessDate()).append(", ReceiptDate=")
+				.append(getReceiptDate()).append(", size=").append(size()).append("]");
 		return sb.toString();
 	}
 }

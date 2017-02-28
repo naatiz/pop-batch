@@ -27,11 +27,8 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cg.natiz.batch.pop.util.ExecutionOption;
 import cg.natiz.batch.pop.util.PopProperties;
-import cg.natiz.batch.pop.util.Puller;
-import cg.natiz.batch.pop.util.Processor;
-import cg.natiz.batch.pop.util.Pusher;
-import cg.natiz.batch.pop.util.Repository;
 
 /**
  * 
@@ -39,8 +36,7 @@ import cg.natiz.batch.pop.util.Repository;
  * 
  */
 @SuppressWarnings("serial")
-public class Pop<T1 extends Serializable, T2 extends Serializable> implements
-		Serializable {
+public class Pop<T1 extends Serializable, T2 extends Serializable> implements Serializable {
 	private static final Logger logger = LoggerFactory.getLogger(Pop.class);
 
 	private Puller<T1> provider;
@@ -66,44 +62,38 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements
 
 	/**
 	 * 
-	 * Execute PoP batch
-	 * 
-	 * @throws Exception
-	 *             if the operation fails
+	 * @param popProperties
+	 * @param executionOptions
+	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
-	public void execute(PopProperties popProperties,
-			ExecutionOption... executionOptions) throws Exception {
+	public void execute(PopProperties popProperties, ExecutionOption... executionOptions) throws Exception {
 
 		logger.info("Incoming/Outcoming repositories initializing ... ");
 		Repository<T1> incoming = Pop.newInstance(Repository.class);
 		Repository<T2> outcoming = Pop.newInstance(Repository.class);
 
-		this.executorService = Executors.newFixedThreadPool(popProperties
-				.getPool());
+		logger.info("PoP settings {}", popProperties);
+		this.executorService = Executors.newFixedThreadPool(popProperties.getPool());
 
-		Set<Callable<String>> workers = new HashSet<Callable<String>>(
-				popProperties.getPool());
+		Set<Callable<String>> workers = new HashSet<Callable<String>>(popProperties.getPool());
 		logger.info("Provider worker initializing ... ");
 		int count = popProperties.getProviderWorkerCount();
 		for (int i = 0; i < count; i++) {
-			workers.add(Pop.newInstance(IncomingWorker.class)
-					.setProvider(provider).setIncoming(incoming));
+			workers.add(Pop.newInstance(IncomingWorker.class).setProvider(provider).setIncoming(incoming));
 		}
 
 		logger.info("Processor worker initializing ... ");
 		count = popProperties.getProcessorWorkerCount();
 		for (int i = 0; i < count; i++) {
-			workers.add(Pop.newInstance(DispatcherWorker.class)
-					.setProcessor(processor).setIncoming(incoming)
+			workers.add(Pop.newInstance(DispatcherWorker.class).setProcessor(processor).setIncoming(incoming)
 					.setOutcoming(outcoming));
 		}
 
 		logger.info("Consumer worker initializing ... ");
 		count = popProperties.getConsumerWorkerCount();
 		for (int i = 0; i < count; i++) {
-			workers.add(Pop.newInstance(OutcomingWorker.class)
-					.setConsumer(consumer).setOutcoming(outcoming));
+			workers.add(Pop.newInstance(OutcomingWorker.class).setConsumer(consumer).setOutcoming(outcoming));
 		}
 
 		logger.info("PoP workers start running ... ");
@@ -126,13 +116,11 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException e) {
-			StringBuilder sb = new StringBuilder("Instanciation failed");
-			logger.error(sb.toString());
-			throw new IllegalStateException(sb.toString(), e);
+			logger.error("Instanciation failed: {}", e.getMessage());
+			throw new IllegalStateException(e.getMessage(), e);
 		} catch (IllegalAccessException e) {
-			StringBuilder sb = new StringBuilder("Access denied");
-			logger.error(sb.toString());
-			throw new IllegalStateException(sb.toString(), e);
+			logger.error("Access denied: {}", e.getMessage());
+			throw new IllegalStateException(e.getMessage(), e);
 		}
 	}
 }
