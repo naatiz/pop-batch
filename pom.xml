@@ -3,28 +3,64 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cg.natiz.batch.pop</groupId>
 	<artifactId>pop-batch</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>PoP Batch</name>
-	<description>Push Or Poll Batch API</description>
+	<description>Push Or Pull Batch API</description>
 	<url>http://naatiz.wordpress.com</url>
-    <licenses>
-        <license>
-            <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
 
+	<organization>
+		<name>Natiz consulting</name>
+		<url>http://naatiz.wordpress.com</url>
+	</organization>
+	
+	<ciManagement>
+		<system>Travis</system>
+		<url>https://travis-ci.org/naatiz/${project.artifactId}</url>
+	</ciManagement>
+	
+	<scm>
+		<connection>scm:git:git://github.com/naatiz/${project.artifactId}.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:naatiz/${project.artifactId}.git</developerConnection>
+		<url>https://github.com/naatiz/${project.artifactId}.git</url>
+		<tag>HEAD</tag>
+	</scm>
+	<distributionManagement>
+		<repository>
+			<id>ossrh</id>
+			<name>default</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<name>default</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-		<junit.version>4.8.2</junit.version>
-		<slf4j.version>1.6.1</slf4j.version>
-		<weld.se.core.version>2.1.1.Final</weld.se.core.version>
-		<compiler.plugin.version>3.1</compiler.plugin.version>
 
-		<!-- maven-compiler-plugin -->
-		<maven.compiler.target>1.7</maven.compiler.target>
-		<maven.compiler.source>1.7</maven.compiler.source>
+		<junit.version>4.12</junit.version>
+		<junit.jupiter.version>5.0.0-M3</junit.jupiter.version>
+		<junit.platform.version>1.0.0-M3</junit.platform.version>
+		<junit.vintage.version>${junit.version}.0-M3</junit.vintage.version>
+
+		<slf4j.version>1.7.7</slf4j.version>
+		<weld.se.core.version>2.3.3.Final</weld.se.core.version>
+
+		<!-- maven plugins -->
+		<compiler.plugin.version>3.6.1</compiler.plugin.version>
+		<compiler.plugin.target>1.8</compiler.plugin.target>
+		<compiler.plugin.source>1.8</compiler.plugin.source>
+
+		<surefire.plugin.version>2.19.1</surefire.plugin.version>
 	</properties>
 	<build>
 		<plugins>
@@ -32,9 +68,35 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${compiler.plugin.version}</version>
 				<configuration>
-					<source>${maven.compiler.source}</source>
-					<target>${maven.compiler.target}</target>
+					<source>${compiler.plugin.sourcet}</source>
+					<target>${compiler.plugin.target}</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${surefire.plugin.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.junit.platform</groupId>
+						<artifactId>junit-platform-surefire-provider</artifactId>
+						<version>${junit.platform.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.junit.jupiter</groupId>
+						<artifactId>junit-jupiter-engine</artifactId>
+						<version>${junit.jupiter.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.junit.vintage</groupId>
+						<artifactId>junit-vintage-engine</artifactId>
+						<version>${junit.vintage.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.junit.vintage</groupId>
+						<artifactId>junit-vintage-engine</artifactId>
+						<version>${junit.vintage.version}</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
@@ -45,15 +107,15 @@
 			<version>${weld.se.core.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

@@ -18,35 +18,27 @@ import cg.natiz.batch.pop.util.ControllerType;
  * @param <T>
  *            managed data type
  */
-public class IncomingWorker<T extends Serializable> implements Callable<String> {
+public class IncomingWorker<T extends Serializable> implements Callable<Reporting> {
 
 	private static final Logger logger = LoggerFactory.getLogger(IncomingWorker.class);
 	private Puller<T> provider;
-	protected Repository<T>[] incoming;
-
-	/**
-	 * @param incoming
-	 *            an incoming repository
-	 * @return this worker object
-	 */
-	public IncomingWorker<T> setIncoming(@SuppressWarnings("unchecked") Repository<T>... incoming) {
-		logger.debug("Setting {} incoming repository(ies)", incoming.length);
-		this.incoming = incoming;
-		return this;
-	}
+	protected Repository<T> incoming;
 
 	/**
 	 * @param provider
 	 *            a data provider
+	 * @param incoming
+	 *            an in memory repository
 	 * @return this worker object
 	 */
-	public IncomingWorker<T> setProvider(@Controller(ControllerType.PROVIDER) Puller<T> provider) {
+	public IncomingWorker<T> init(@Controller(ControllerType.PROVIDER) Puller<T> provider, Repository<T> incoming) {
 		this.provider = provider;
+		this.incoming = incoming;
 		return this;
 	}
 
 	@Override
-	public String call() throws Exception {
+	public Reporting call() throws Exception {
 		Container<T> current = null;
 		Container<T> container = null;
 		int waiting = 1;
@@ -54,16 +46,17 @@ public class IncomingWorker<T extends Serializable> implements Callable<String> 
 			logger.debug("Provider waiting for {} ms", waiting);
 			container = provider.pull();
 			if (container != null && !container.isEmpty()
-					&& incoming[0].push(container.setReference(incoming[0].getReference()).setSendDate(new Date()))) {
+					&& incoming.push(container.setReference(incoming.getReference()).setSendDate(new Date()))) {
 				current = container;
-				logger.debug("Pushed to incoming {} \nIncoming stock = {}", current, incoming[0].size());
+				logger.debug("Pushed to incoming {} \nIncoming stock = {}", current, incoming.size());
 			}
 			Thread.sleep(waiting);
 		} while (container != null);
-		incoming[0].close();
+		incoming.close();
 
 		StringBuilder sb = new StringBuilder().append(this.getClass().getSimpleName()).append(" : ")
 				.append(current.toString());
-		return sb.toString();
+		Reporting reporting = Pop.newInstance(Reporting.class).setDescription(sb.toString());
+		return reporting;
 	}
 }

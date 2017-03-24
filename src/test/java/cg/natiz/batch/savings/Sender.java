@@ -28,7 +28,7 @@ public class Sender implements Puller<String> {
 	/* maximum number of containers */
 	private final long MAX_CONTAINER_NUMBER = 1000;
 	/* maximum number of elements inside a container */
-	private final int MAX_CONTAINER_SIZE = 100;
+	private final int MAX_CONTAINER_SIZE = 10000;
 
 	/* current container number */
 	private final AtomicLong CURRENT_CONTAINER_NUMBER = new AtomicLong(0);

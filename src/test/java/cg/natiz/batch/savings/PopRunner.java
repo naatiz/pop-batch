@@ -16,6 +16,7 @@ import cg.natiz.batch.pop.Puller;
 import cg.natiz.batch.pop.Pusher;
 import cg.natiz.batch.pop.util.Controller;
 import cg.natiz.batch.pop.util.ControllerType;
+import cg.natiz.batch.pop.util.ExecutionOption;
 
 public class PopRunner {
 
@@ -24,16 +25,18 @@ public class PopRunner {
 
 	@Inject
 	// @PopConfig({"/pop.cfg"})
-	private PopProperties config;
+	private PopProperties popProperties;
 
 	private Pop<String, Long> savings;
 
 	@Inject
 	@SuppressWarnings("unchecked")
-	public void initSavings(@Savings @Controller(ControllerType.PROVIDER) final Puller<String> sender,
+	public void initSavings(@Savings @Controller(ControllerType.PROVIDER) final Puller<String> provider,
 			@Savings @Controller(ControllerType.PROCESSOR) final Processor<String, Long> processor,
-			@Savings @Controller(ControllerType.CONSUMER) final Pusher<Long> recipient) {
-		this.savings = Pop.newInstance(Pop.class).setProvider(sender).setProcessor(processor).setConsumer(recipient);
+			@Savings @Controller(ControllerType.CONSUMER) final Pusher<Long> consumer) {
+
+		this.savings = Pop.newInstance(Pop.class).addConfiguration(popProperties, ExecutionOption.NONE).build(provider,
+				processor, consumer);
 	}
 
 	/**
@@ -47,8 +50,8 @@ public class PopRunner {
 			throw new IllegalStateException("R, M or V option parameter is missing!");
 		}
 
-		logger.info("Batch starting ... ");
-		savings.execute(config);
-		logger.info("Batch execution ends successfully!");
+		logger.info("Batch savings starting ... ");
+		savings.start();
+		logger.info("Batch savings ends successfully!");
 	}
 }

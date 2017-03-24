@@ -25,54 +25,42 @@ import cg.natiz.batch.pop.util.ControllerType;
  * @param <T2>
  *            targeted managed data type
  */
-public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> implements Callable<String> {
+public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> implements Callable<Reporting> {
 
 	private static final Logger logger = LoggerFactory.getLogger(DispatcherWorker.class);
-	protected Repository<T1>[] incoming;
-	protected Repository<T2>[] outcoming;
+
+	protected Repository<T1> incoming;
+	protected Repository<T2> outcoming;
 	protected Processor<T1, T2> processor;
 
 	/**
+	 * 
 	 * @param processor
 	 *            a data processor
-	 */
-	public DispatcherWorker<T1, T2> setProcessor(@Controller(ControllerType.PROCESSOR) Processor<T1, T2> processor) {
-		this.processor = processor;
-		return this;
-	}
-
-	/**
 	 * @param incoming
-	 *            an incoming repository
-	 * @return this worker object
-	 */
-	public DispatcherWorker<T1, T2> setIncoming(@SuppressWarnings("unchecked") Repository<T1>... incoming) {
-		logger.debug("Setting {} incoming repository(ies)", incoming.length);
-		this.incoming = incoming;
-		return this;
-	}
-
-	/**
+	 *            in memory incoming repository
 	 * @param outcoming
-	 *            an outcoming repository
+	 *            in memory outcoming repository
 	 * @return this worker object
 	 */
-	public DispatcherWorker<T1, T2> setOutcoming(@SuppressWarnings("unchecked") Repository<T2>... outcoming) {
-		logger.debug("Setting {} outcoming repository(ies)", outcoming.length);
+	public DispatcherWorker<T1, T2> init(@Controller(ControllerType.PROCESSOR) Processor<T1, T2> processor,
+			Repository<T1> incoming, Repository<T2> outcoming) {
+		this.processor = processor;
+		this.incoming = incoming;
 		this.outcoming = outcoming;
 		return this;
 	}
 
 	@Override
-	public String call() throws Exception {
+	public Reporting call() throws Exception {
 		Container<T1> current = null;
 		Container<T1> container = null;
 		int waiting = 2;
-		while (incoming[0].isOpen()) {
+		while (incoming.isOpen()) {
 			logger.debug("Processor waiting for {} ms", waiting);
 			Thread.sleep(waiting);
-			waiting = (int) Math.max(2, Math.cbrt(incoming[0].size()));
-			while ((container = incoming[0].pull()) != null) {
+			waiting = (int) Math.max(2, Math.cbrt(incoming.size()));
+			while ((container = incoming.pull()) != null) {
 				container.setStartProcessDate(new Date());
 				List<T1> content = container.getContent();
 				List<T2> processedContent = new ArrayList<T2>(content.size());
@@ -88,7 +76,7 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 				if (!processedContent.isEmpty()) {
 					@SuppressWarnings("unchecked")
 					Container<T2> newContainer = Pop.newInstance(Container.class);
-					if (outcoming[0].push(newContainer.setReference(outcoming[0].getReference())
+					if (outcoming.push(newContainer.setReference(outcoming.getReference())
 							.setSendDate(container.getSendDate()).setStartProcessDate(container.getStartProcessDate())
 							.setEndProcessDate(new Date()).addAll(processedContent))) {
 						logger.debug("Pushed to outcoming {}", newContainer);
@@ -97,9 +85,10 @@ public class DispatcherWorker<T1 extends Serializable, T2 extends Serializable> 
 				current = container.setEndProcessDate(new Date());
 			}
 		}
-		outcoming[0].close();
+		outcoming.close();
 		StringBuilder sb = new StringBuilder().append(this.getClass().getSimpleName()).append(" : ")
 				.append(current.toString());
-		return sb.toString();
+		Reporting reporting = Pop.newInstance(Reporting.class).setDescription(sb.toString());
+		return reporting;
 	}
 }

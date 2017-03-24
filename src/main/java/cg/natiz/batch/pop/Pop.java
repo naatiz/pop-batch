@@ -27,6 +27,8 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cg.natiz.batch.pop.util.Controller;
+import cg.natiz.batch.pop.util.ControllerType;
 import cg.natiz.batch.pop.util.ExecutionOption;
 import cg.natiz.batch.pop.util.PopProperties;
 
@@ -39,70 +41,95 @@ import cg.natiz.batch.pop.util.PopProperties;
 public class Pop<T1 extends Serializable, T2 extends Serializable> implements Serializable {
 	private static final Logger logger = LoggerFactory.getLogger(Pop.class);
 
-	private Puller<T1> provider;
-	private Processor<T1, T2> processor;
-	private Pusher<T2> consumer;
+	private PopProperties popProperties;
+	private ExecutionOption[] executionOptions;
 
-	private ExecutorService executorService;
+	private Set<Callable<Reporting>> workers;
 
-	public Pop<T1, T2> setProvider(Puller<T1> provider) {
-		this.provider = provider;
-		return this;
+	/**
+	 * Add PoP configuration
+	 * 
+	 * @param popProperties
+	 * @return Pop instance with ExecutionOption set to <code>ExecutionOption.NONE</code>
+	 */
+	public Pop<T1, T2> addConfiguration(PopProperties popProperties) {
+		return addConfiguration(popProperties, ExecutionOption.NONE);
 	}
 
-	public Pop<T1, T2> setProcessor(Processor<T1, T2> processor) {
-		this.processor = processor;
-		return this;
-	}
-
-	public Pop<T1, T2> setConsumer(Pusher<T2> consumer) {
-		this.consumer = consumer;
+	/**
+	 * Add PoP configuration
+	 * 
+	 * @param popProperties
+	 * @param executionOptions
+	 * @return Pop instance
+	 */
+	public Pop<T1, T2> addConfiguration(PopProperties popProperties, ExecutionOption... executionOptions) {
+		this.popProperties = popProperties;
+		this.executionOptions = executionOptions;
 		return this;
 	}
 
 	/**
+	 * Build Pop before execution
 	 * 
-	 * @param popProperties
-	 * @param executionOptions
-	 * @throws Exception 
+	 * @param provider
+	 *            a data provider
+	 * 
+	 * @param processor
+	 *            a data processor
+	 * 
+	 * @param consumer
+	 *            a processed data consumer
+	 * @return Pop instance
 	 */
 	@SuppressWarnings("unchecked")
-	public void execute(PopProperties popProperties, ExecutionOption... executionOptions) throws Exception {
+	public Pop<T1, T2> build(@Controller(ControllerType.PROVIDER) Puller<T1> provider,
+			@Controller(ControllerType.PROCESSOR) Processor<T1, T2> processor,
+			@Controller(ControllerType.CONSUMER) Pusher<T2> consumer) {
 
 		logger.info("Incoming/Outcoming repositories initializing ... ");
 		Repository<T1> incoming = Pop.newInstance(Repository.class);
 		Repository<T2> outcoming = Pop.newInstance(Repository.class);
 
-		logger.info("PoP settings {}", popProperties);
-		this.executorService = Executors.newFixedThreadPool(popProperties.getPool());
-
-		Set<Callable<String>> workers = new HashSet<Callable<String>>(popProperties.getPool());
+		this.workers = new HashSet<Callable<Reporting>>(popProperties.getPool());
 		logger.info("Provider worker initializing ... ");
 		int count = popProperties.getProviderWorkerCount();
 		for (int i = 0; i < count; i++) {
-			workers.add(Pop.newInstance(IncomingWorker.class).setProvider(provider).setIncoming(incoming));
+			this.workers.add(Pop.newInstance(IncomingWorker.class).init(provider, incoming));
 		}
 
 		logger.info("Processor worker initializing ... ");
 		count = popProperties.getProcessorWorkerCount();
 		for (int i = 0; i < count; i++) {
-			workers.add(Pop.newInstance(DispatcherWorker.class).setProcessor(processor).setIncoming(incoming)
-					.setOutcoming(outcoming));
+			this.workers.add(Pop.newInstance(DispatcherWorker.class).init(processor, incoming, outcoming));
 		}
 
 		logger.info("Consumer worker initializing ... ");
 		count = popProperties.getConsumerWorkerCount();
 		for (int i = 0; i < count; i++) {
-			workers.add(Pop.newInstance(OutcomingWorker.class).setConsumer(consumer).setOutcoming(outcoming));
+			this.workers.add(Pop.newInstance(OutcomingWorker.class).init(consumer, outcoming));
 		}
 
-		logger.info("PoP workers start running ... ");
-		List<Future<String>> futures = executorService.invokeAll(workers);
-		for (Future<String> future : futures) {
-			logger.debug(future.get());
+		logger.info("PoP settings {}", popProperties);
+		logger.info("PoP execution options {}", (Object[]) executionOptions);
+
+		return this;
+	}
+
+	/**
+	 * Execute a current thread pool
+	 * 
+	 * @throws Exception
+	 */
+	public void start() throws Exception {
+		ExecutorService executorService = Executors.newFixedThreadPool(popProperties.getPool());
+		logger.info("PoP engine start running ... ");
+		List<Future<Reporting>> futures = executorService.invokeAll(this.workers);
+		for (Future<Reporting> future : futures) {
+			logger.debug(future.get().toString());
 		}
 		executorService.shutdown();
-		logger.info("PoP workers end running successfully");
+		logger.info("PoP engine ends successfully");
 	}
 
 	/**

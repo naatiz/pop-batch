@@ -15,9 +15,12 @@
  */
 package cg.natiz.batch.pop.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Properties;
 
@@ -51,12 +54,20 @@ public class PopResources {
 	 * 
 	 * @param ip
 	 * @return
+	 * @throws IOException
 	 */
 	@Produces
 	@Property
-	public String injectStringProperty(InjectionPoint ip) {
+	public String injectStringProperty(InjectionPoint ip) throws IOException {
 		Property property = ip.getAnnotated().getAnnotation(Property.class);
-		Properties properties = this.loadFromFile(property.src()[0]);
+
+		Properties properties = new Properties();
+		URL url = this.getClass().getClassLoader().getResource(property.src()[0]);
+		Path path = Paths.get(url.getPath());
+		try (BufferedReader reader = Files.newBufferedReader(path)) {
+			properties.load(reader);
+		}
+
 		String value = properties.getProperty(property.key(), property.defaultValue());
 		if (property.mandatory() && (value == null || value.isEmpty())) {
 			throw new IllegalStateException(MessageFormat.format("Value is required for the key %s", property.key()));
@@ -66,12 +77,11 @@ public class PopResources {
 
 	/**
 	 * 
-	 * @param ip
-	 * @return
+	 * @param ip @return @throws IOException @throws
 	 */
 	@Produces
 	@Property
-	public int injectIntegerProperty(InjectionPoint ip) {
+	public int injectIntegerProperty(InjectionPoint ip) throws IOException {
 		return Integer.parseInt(injectStringProperty(ip));
 	}
 
@@ -79,11 +89,13 @@ public class PopResources {
 	 * 
 	 * @param ip
 	 * @return
+	 * @throws IOException
+	 * @throws NumberFormatException
 	 * @throws IllegalStateException
 	 */
 	@Produces
 	@Property
-	public Long injectLongProperty(InjectionPoint ip) {
+	public Long injectLongProperty(InjectionPoint ip) throws IOException {
 		return Long.parseLong(injectStringProperty(ip));
 	}
 
@@ -100,9 +112,10 @@ public class PopResources {
 			throw new IllegalStateException(
 					"PopConfig value not found in " + ip.getMember().getDeclaringClass().getName());
 		}
+		logger.debug("Populating PopProperties");
 		PopProperties pp = new PopProperties();
 
-		// Properties properties = this.loadFromFile(popConfig.value()[0]);
+		// PProperties properties = new Properties();
 
 		// int providerWorkerCount =
 		// Integer.parseInt(properties.getProperty("provider.worker.count",
@@ -115,33 +128,5 @@ public class PopResources {
 		// "1");
 
 		return pp;
-	}
-
-	/**
-	 * 
-	 * @param path
-	 * @return
-	 */
-	private Properties loadFromFile(String path) {
-		InputStream in = null;
-		Properties properties = new Properties();
-		try {
-			URL url = this.getClass().getClassLoader().getResource(path);
-			logger.debug("Loading properties from the file : {}", url);
-			in = this.getClass().getClassLoader().getResourceAsStream(path);
-			properties.load(in);
-		} catch (Exception e) {
-			logger.error("Cannot load the properties file : {}", path);
-			throw new IllegalStateException(e.getMessage(), e);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					logger.warn("Cannot close the properties InputStream", e);
-				}
-			}
-		}
-		return properties;
 	}
 }
