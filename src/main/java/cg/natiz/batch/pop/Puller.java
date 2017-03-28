@@ -4,6 +4,7 @@
 package cg.natiz.batch.pop;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * @author natiz
@@ -17,5 +18,5 @@ public interface Puller<T extends Serializable> extends Serializable {
 	 * @throws Exception
 	 *             if the pull operation fails
 	 */
-	public Container<T> pull() throws Exception;
+	public Optional<Container<T>> pull() throws Exception;
 }

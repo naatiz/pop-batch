@@ -3,6 +3,8 @@
  */
 package cg.natiz.batch.savings;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -25,8 +27,8 @@ public class Recipient implements Pusher<Long> {
 	private Logger logger;
 
 	@Override
-	public boolean push(Container<Long> container) throws Exception {
-		if (container.getReference() == 5) {
+	public boolean push(Optional<Container<Long>> container) throws Exception {
+		if (container.isPresent() && container.get().getReference() == 5) {
 			logger.warn("Rejecting : {}", container);
 		}
 		logger.debug(container.toString());

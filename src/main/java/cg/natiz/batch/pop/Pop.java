@@ -20,9 +20,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +52,8 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 	 * Add PoP configuration
 	 * 
 	 * @param popProperties
-	 * @return Pop instance with ExecutionOption set to <code>ExecutionOption.NONE</code>
+	 * @return Pop instance with ExecutionOption set to
+	 *         <code>ExecutionOption.NONE</code>
 	 */
 	public Pop<T1, T2> addConfiguration(PopProperties popProperties) {
 		return addConfiguration(popProperties, ExecutionOption.NONE);
@@ -88,8 +91,8 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 			@Controller(ControllerType.CONSUMER) Pusher<T2> consumer) {
 
 		logger.info("Incoming/Outcoming repositories initializing ... ");
-		Repository<T1> incoming = Pop.newInstance(Repository.class);
-		Repository<T2> outcoming = Pop.newInstance(Repository.class);
+		Repository<T1> incoming = Pop.newInstance(InMemoryRepository.class);
+		Repository<T2> outcoming = Pop.newInstance(InMemoryRepository.class);
 
 		this.workers = new HashSet<Callable<Reporting>>(popProperties.getPool());
 		logger.info("Provider worker initializing ... ");
@@ -101,7 +104,7 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 		logger.info("Processor worker initializing ... ");
 		count = popProperties.getProcessorWorkerCount();
 		for (int i = 0; i < count; i++) {
-			this.workers.add(Pop.newInstance(DispatcherWorker.class).init(processor, incoming, outcoming));
+			this.workers.add(Pop.newInstance(ProcessingWorker.class).init(processor, incoming, outcoming));
 		}
 
 		logger.info("Consumer worker initializing ... ");
@@ -122,13 +125,19 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 	 * @throws Exception
 	 */
 	public void start() throws Exception {
-		ExecutorService executorService = Executors.newFixedThreadPool(popProperties.getPool());
+		final ExecutorService executorService = Executors.newFixedThreadPool(popProperties.getPool());
 		logger.info("PoP engine start running ... ");
 		List<Future<Reporting>> futures = executorService.invokeAll(this.workers);
-		for (Future<Reporting> future : futures) {
-			logger.debug(future.get().toString());
-		}
+		List<Reporting> reportings = futures.stream().map(future -> {
+			try {
+				return future.get();
+			} catch (InterruptedException | ExecutionException e) {
+				logger.error(e.getMessage(), e);
+				return Pop.newInstance(Reporting.class);
+			}
+		}).collect(Collectors.toList());
 		executorService.shutdown();
+		logger.info("Size: " + reportings.size());
 		logger.info("PoP engine ends successfully");
 	}
 

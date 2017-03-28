@@ -4,6 +4,7 @@
 package cg.natiz.batch.pop;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * @author natiz
@@ -20,5 +21,5 @@ public interface Processor<T1 extends Serializable, T2 extends Serializable> ext
 	 * @throws Exception
 	 *             if the operation fails
 	 */
-	public T2 process(final T1 entity) throws Exception;
+	public Optional<T2> process(final Optional<T1> entity) throws Exception;
 }

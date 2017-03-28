@@ -3,6 +3,7 @@
  */
 package cg.natiz.batch.savings;
 
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -28,7 +29,7 @@ public class Sender implements Puller<String> {
 	/* maximum number of containers */
 	private final long MAX_CONTAINER_NUMBER = 1000;
 	/* maximum number of elements inside a container */
-	private final int MAX_CONTAINER_SIZE = 10000;
+	private final int MAX_CONTAINER_SIZE = 100;
 
 	/* current container number */
 	private final AtomicLong CURRENT_CONTAINER_NUMBER = new AtomicLong(0);
@@ -38,14 +39,13 @@ public class Sender implements Puller<String> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Container<String> pull() throws Exception {
+	public Optional<Container<String>> pull() throws Exception {
 
 		if (!hasMoreData()) {
 			logger.info("No data anymore ...");
-			return null;
+			return Optional.empty();
 		}
 		Container<String> container = Pop.newInstance(Container.class);
-		container.setReference(CURRENT_CONTAINER_NUMBER.get());
 		String token = null;
 		for (int i = 0; i < MAX_CONTAINER_SIZE; i++) {
 			token = "" + ThreadLocalRandom.current().nextInt(MAX_CONTAINER_SIZE);
@@ -56,7 +56,7 @@ public class Sender implements Puller<String> {
 			container.add(token);
 		}
 		CURRENT_CONTAINER_NUMBER.incrementAndGet();
-		return container;
+		return Optional.of(container);
 	}
 
 	private boolean hasMoreData() {

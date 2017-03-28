@@ -3,6 +3,7 @@
  */
 package cg.natiz.batch.savings;
 
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
@@ -28,10 +29,10 @@ public class Behoof implements Processor<String, Long> {
 	private Logger logger;
 
 	@Override
-	public Long process(String entity) throws Exception {
+	public Optional<Long> process(Optional<String> entity) throws Exception {
 		logger.debug("Processing String {} to Long value, plus 5-15 %", entity);
-		Long value = Long.valueOf(entity);
+		Long value = Long.valueOf(entity.get());
 		value = (long) Math.ceil(value * (1 + (ThreadLocalRandom.current().nextInt(5, 15) / 100)));
-		return value;
+		return Optional.of(value);
 	}
 }

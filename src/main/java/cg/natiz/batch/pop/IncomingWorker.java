@@ -1,7 +1,10 @@
 package cg.natiz.batch.pop;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -18,17 +21,19 @@ import cg.natiz.batch.pop.util.ControllerType;
  * @param <T>
  *            managed data type
  */
-public class IncomingWorker<T extends Serializable> implements Callable<Reporting> {
+final class IncomingWorker<T extends Serializable> implements Callable<Reporting> {
 
 	private static final Logger logger = LoggerFactory.getLogger(IncomingWorker.class);
 	private Puller<T> provider;
-	protected Repository<T> incoming;
+	private Repository<T> incoming;
+
+	private long currentContainerId = 0L;
 
 	/**
 	 * @param provider
 	 *            a data provider
 	 * @param incoming
-	 *            an in memory repository
+	 *            an incoming repository
 	 * @return this worker object
 	 */
 	public IncomingWorker<T> init(@Controller(ControllerType.PROVIDER) Puller<T> provider, Repository<T> incoming) {
@@ -39,24 +44,34 @@ public class IncomingWorker<T extends Serializable> implements Callable<Reportin
 
 	@Override
 	public Reporting call() throws Exception {
-		Container<T> current = null;
-		Container<T> container = null;
+		final Reporting reporting = Reporting.INCOMING;
+		Optional<Container<T>> container = Optional.empty();
 		int waiting = 1;
+		LocalDateTime beginDate = LocalDateTime.now();
 		do {
 			logger.debug("Provider waiting for {} ms", waiting);
-			container = provider.pull();
-			if (container != null && !container.isEmpty()
-					&& incoming.push(container.setReference(incoming.getReference()).setSendDate(new Date()))) {
-				current = container;
-				logger.debug("Pushed to incoming {} \nIncoming stock = {}", current, incoming.size());
-			}
 			Thread.sleep(waiting);
-		} while (container != null);
-		incoming.close();
-
-		StringBuilder sb = new StringBuilder().append(this.getClass().getSimpleName()).append(" : ")
-				.append(current.toString());
-		Reporting reporting = Pop.newInstance(Reporting.class).setDescription(sb.toString());
+			container = provider.pull();
+			if (container == null)
+				continue;
+			if (incoming.push(container)) {
+				container.ifPresent(c -> {
+					c.setReference(++currentContainerId).setSendDate(new Date());
+					reporting.incrementContainersNumber().incrementItemsNumber(c.getContent().size());
+				});
+				logger.debug("Pushed to incoming {} \nIncoming stock = {}", container, incoming.size());
+			} else {
+				container.ifPresent(c -> {
+					c.setReference(++currentContainerId).setSendDate(new Date());
+					reporting.setDescription(c.toString());
+				});
+				logger.warn("Pushing to incoming fails {} \nIncoming stock = {}", container, incoming.size());
+			}
+		} while (container.isPresent());
+		reporting.setIncomingDuration(ChronoUnit.SECONDS.between(beginDate, LocalDateTime.now()));
+		logger.info("Worker ends successfully in {}s, {} containers and {} items ", reporting.getIncomingDuration(),
+				reporting.getContainersNumber(), reporting.getItemsNumber());
+		currentContainerId = 0L; // Initializing this ID
 		return reporting;
 	}
 }
