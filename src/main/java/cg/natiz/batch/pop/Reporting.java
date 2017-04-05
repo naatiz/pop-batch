@@ -4,6 +4,11 @@
 package cg.natiz.batch.pop;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author natiz
@@ -12,16 +17,10 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Reporting implements Serializable {
 
-	final static Reporting INCOMING = new Reporting(WorkerType.INCOMING);
-	final static Reporting PROCESSING = new Reporting(WorkerType.PROCESSING);
-	final static Reporting OUTCOMING = new Reporting(WorkerType.OUTCOMING);
+	private final static int MAX_RAPPORT_SIZE = 200;
 
 	private long containersNumber = 0;
 	private long itemsNumber = 0;
-
-	private long incomingDuration = 0;
-	private long processingDuration = 0;
-	private long outcomingDuration = 0;
 
 	private enum WorkerType {
 		INCOMING, PROCESSING, OUTCOMING
@@ -29,33 +28,64 @@ public class Reporting implements Serializable {
 
 	private WorkerType type;
 
+	private LocalDateTime startDate = LocalDateTime.now();
+	private LocalDateTime endDate = startDate;
+
+	private List<String> rapports = Lists.newArrayList();
+
 	/**
 	 * 
+	 * @param type
 	 */
-	private String description;
-
-	protected Reporting(WorkerType type) {
+	private Reporting(WorkerType type) {
 		this.type = type;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static Reporting newIncomingRepository() {
+		return new Reporting(WorkerType.INCOMING).start();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static Reporting newProcessingRepository() {
+		return new Reporting(WorkerType.PROCESSING).start();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static Reporting newOutcomingRepository() {
+		return new Reporting(WorkerType.OUTCOMING).start();
+	}
 
-	public String getDescription() {
-		return description;
+	public List<String> getRapports() {
+		return rapports;
 	}
 
 	/**
 	 * 
-	 * @param description
+	 * @param message
 	 * @return
 	 */
-	public Reporting setDescription(String description) {
-		this.description = description;
+	public Reporting addRapport(String message) {
+		this.rapports.add(message);
+		if (this.rapports.size() > MAX_RAPPORT_SIZE)
+			throw new IllegalStateException("Too many (" + MAX_RAPPORT_SIZE + ") wrong rapports have been generated");
 		return this;
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer(this.getDescription());
-		return sb.toString();
+		String report = String.format("Total time/containers/items: %ds/%d/%d", this.getDuration(),
+				this.getContainersNumber(), this.getItemsNumber());
+		return report;
 	}
 
 	public WorkerType getType() {
@@ -80,30 +110,17 @@ public class Reporting implements Serializable {
 		return this;
 	}
 
-	public long getIncomingDuration() {
-		return incomingDuration;
+	public long getDuration() {
+		return ChronoUnit.SECONDS.between(startDate, endDate);
 	}
 
-	public Reporting setIncomingDuration(long incomingDuration) {
-		this.incomingDuration = incomingDuration;
+	public Reporting start() {
+		this.startDate = LocalDateTime.now();
 		return this;
 	}
 
-	public long getProcessingDuration() {
-		return processingDuration;
-	}
-
-	public Reporting setProcessingDuration(long processingDuration) {
-		this.processingDuration = processingDuration;
-		return this;
-	}
-
-	public long getOutcomingDuration() {
-		return outcomingDuration;
-	}
-
-	public Reporting setOutcomingDuration(long outcomingDuration) {
-		this.outcomingDuration = outcomingDuration;
+	public Reporting stop() {
+		this.endDate = LocalDateTime.now();
 		return this;
 	}
 }

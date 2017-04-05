@@ -53,7 +53,7 @@ public class Sender implements Puller<String> {
 				token += "A";
 				logger.warn("Adding wrong data {}, this {} will be rejected", token, container);
 			}
-			container.add(token);
+			container.addItem(token);
 		}
 		CURRENT_CONTAINER_NUMBER.incrementAndGet();
 		return Optional.of(container);

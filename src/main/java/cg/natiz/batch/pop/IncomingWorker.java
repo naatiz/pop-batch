@@ -1,8 +1,6 @@
 package cg.natiz.batch.pop;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -44,33 +42,33 @@ final class IncomingWorker<T extends Serializable> implements Callable<Reporting
 
 	@Override
 	public Reporting call() throws Exception {
-		final Reporting reporting = Reporting.INCOMING;
+		final Reporting reporting = Reporting.newIncomingRepository();
 		Optional<Container<T>> container = Optional.empty();
 		int waiting = 1;
-		LocalDateTime beginDate = LocalDateTime.now();
 		do {
 			logger.debug("Provider waiting for {} ms", waiting);
 			Thread.sleep(waiting);
-			container = provider.pull();
-			if (container == null)
-				continue;
-			if (incoming.push(container)) {
-				container.ifPresent(c -> {
-					c.setReference(++currentContainerId).setSendDate(new Date());
-					reporting.incrementContainersNumber().incrementItemsNumber(c.getContent().size());
-				});
-				logger.debug("Pushed to incoming {} \nIncoming stock = {}", container, incoming.size());
-			} else {
-				container.ifPresent(c -> {
-					c.setReference(++currentContainerId).setSendDate(new Date());
-					reporting.setDescription(c.toString());
-				});
-				logger.warn("Pushing to incoming fails {} \nIncoming stock = {}", container, incoming.size());
-			}
+			container = Optional.ofNullable(provider.pull()).orElseGet(Optional::empty);
+			container.ifPresent(c -> {
+				try {
+					if (incoming.push(Optional.of(c))) {
+						c.setReference(++currentContainerId).setSendDate(new Date());
+						reporting.incrementContainersNumber().incrementItemsNumber(c.getItems().size());
+						logger.debug("Pushed to incoming {} \nIncoming stock = {}", c, incoming.size());
+					} else {
+						c.setReference(++currentContainerId).setSendDate(new Date());
+						String message = String.format("Pushing to incoming fails %s \nIncoming stock = %d", c,
+								incoming.size());
+						throw new Exception(message);
+					}
+				} catch (Exception e) {
+					reporting.addRapport(e.getMessage());
+					logger.warn("Cannot push container to incoming repository: " + c, e);
+				}
+			});
+			incoming.setPushable(container.isPresent());
 		} while (container.isPresent());
-		reporting.setIncomingDuration(ChronoUnit.SECONDS.between(beginDate, LocalDateTime.now()));
-		logger.info("Worker ends successfully in {}s, {} containers and {} items ", reporting.getIncomingDuration(),
-				reporting.getContainersNumber(), reporting.getItemsNumber());
+		logger.info("Worker ends successfully. {} ", reporting.stop());
 		currentContainerId = 0L; // Initializing this ID
 		return reporting;
 	}

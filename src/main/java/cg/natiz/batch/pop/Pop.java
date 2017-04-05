@@ -124,7 +124,7 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 	 * 
 	 * @throws Exception
 	 */
-	public void start() throws Exception {
+	public List<Reporting> start() throws Exception {
 		final ExecutorService executorService = Executors.newFixedThreadPool(popProperties.getPool());
 		logger.info("PoP engine start running ... ");
 		List<Future<Reporting>> futures = executorService.invokeAll(this.workers);
@@ -137,8 +137,8 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 			}
 		}).collect(Collectors.toList());
 		executorService.shutdown();
-		logger.info("Size: " + reportings.size());
 		logger.info("PoP engine ends successfully");
+		return reportings;
 	}
 
 	/**

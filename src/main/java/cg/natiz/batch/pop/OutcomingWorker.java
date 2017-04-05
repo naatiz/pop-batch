@@ -1,8 +1,6 @@
 package cg.natiz.batch.pop;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -44,32 +42,33 @@ class OutcomingWorker<T extends Serializable> implements Callable<Reporting> {
 
 	@Override
 	public Reporting call() throws Exception {
-		final Reporting reporting = Reporting.OUTCOMING;
+		final Reporting reporting = Reporting.newOutcomingRepository();
 		Optional<Container<T>> container = Optional.empty();
 		int waiting = 3;
-		LocalDateTime beginDate = LocalDateTime.now();
 		do {
 			logger.debug("Consumer waiting for {} ms", waiting);
 			Thread.sleep(waiting);
 			logger.debug("Outcoming stock = {}", outcoming.size());
 			waiting = (int) Math.max(3, Math.cbrt(outcoming.size()));
-			container = outcoming.pull();
-			if (container == null)
-				continue;
-			container.ifPresent(c -> c.setReceiptDate(new Date()));
-			if (container.isPresent() && consumer.push(container)) {
-				container.ifPresent(c ->reporting.incrementContainersNumber().incrementItemsNumber(c.getContent().size()));
-				logger.debug("Pushed to consumer : {}", container);
-			} else {
-				container.ifPresent(c -> {
-					reporting.setDescription(c.toString());
-					logger.warn("Pushing to consumer fails {} \nOutcoming stock = {}", c, outcoming.size());
-				});
-			}
-		} while (container.isPresent());
-		reporting.setOutcomingDuration(ChronoUnit.SECONDS.between(beginDate, LocalDateTime.now()));
-		logger.info("Worker ends successfully in {}s, {} containers and {} items ", reporting.getOutcomingDuration(),
-				reporting.getContainersNumber(), reporting.getItemsNumber());
+			container = Optional.ofNullable(outcoming.pull()).orElseGet(Optional::empty);
+			container.ifPresent(c -> {
+				c.setReceiptDate(new Date());
+				try {
+					if (consumer.push(Optional.of(c))) {
+						reporting.incrementContainersNumber().incrementItemsNumber(c.getItems().size());
+						logger.debug("Pushed to consumer : {}", c);
+					} else {
+						String message = String.format("Pushing to consumer fails %s \nOutcoming stock = %d", c,
+								outcoming.size());
+						throw new Exception(message);
+					}
+				} catch (Exception e) {
+					reporting.addRapport(e.getMessage());
+					logger.warn("Cannot push container to consumer: " + c, e);
+				}
+			});
+		} while (outcoming.isOpen());
+		logger.info("Worker ends successfully. {} ", reporting.stop());
 		return reporting;
 	}
 }

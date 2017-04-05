@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 /**
  * @author natiz
  * 
@@ -23,40 +25,40 @@ public class Container<T> implements Serializable {
 	private Date startProcessDate;
 	private Date endProcessDate;
 
-	private List<T> content = new ArrayList<T>(100);
+	private List<T> items = Lists.newArrayList();
 
 	protected Container() {
 	}
 
-	public Container<T> add(T element) {
-		this.content.add(element);
+	public Container<T> addItem(T element) {
+		this.items.add(element);
 		return this;
 	}
 
-	public Container<T> addAll(Collection<T> collection) {
-		this.content.addAll(collection);
+	public Container<T> addAllItems(Collection<T> collection) {
+		this.items.addAll(collection);
 		return this;
 	}
 
 	/**
 	 * An set with the same content as the container
 	 * 
-	 * @return a set of the same content
+	 * @return a set of the items
 	 */
-	public List<T> getContent() {
-		return new ArrayList<T>(this.content);
+	public List<T> getItems() {
+		return new ArrayList<T>(this.items);
 	}
 
 	public int size() {
-		return content.size();
+		return items.size();
 	}
 
 	public boolean isEmpty() {
-		return content.isEmpty();
+		return items.isEmpty();
 	}
 
 	public void clear() {
-		content.clear();
+		items.clear();
 	}
 
 	public long getReference() {

@@ -14,6 +14,7 @@ import cg.natiz.batch.pop.Pop;
 import cg.natiz.batch.pop.Processor;
 import cg.natiz.batch.pop.Puller;
 import cg.natiz.batch.pop.Pusher;
+import cg.natiz.batch.pop.Reporting;
 import cg.natiz.batch.pop.util.Controller;
 import cg.natiz.batch.pop.util.ControllerType;
 import cg.natiz.batch.pop.util.ExecutionOption;
@@ -46,12 +47,16 @@ public class PopRunner {
 	 * @throws Exception
 	 */
 	public void execute(@Observes ContainerInitialized event, @Parameters List<String> parameters) throws Exception {
-		if (parameters.isEmpty() || !parameters.get(0).contains("-RMV")) {
-			throw new IllegalStateException("R, M or V option parameter is missing!");
+
+		// Revival = relance ou reprise
+		logger.debug("Running options : -M=Monitoring -R=Revival");
+		if (parameters.isEmpty() || !parameters.get(0).contains("-MR")) {
+			throw new IllegalStateException("M or R option parameter is missing!");
 		}
 
 		logger.info("Batch savings starting ... ");
-		savings.start();
+		List<Reporting> reportings = savings.start();
+		logger.info("Reportings size: " + reportings.size());
 		logger.info("Batch savings ends successfully!");
 	}
 }
