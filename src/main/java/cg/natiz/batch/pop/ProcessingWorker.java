@@ -56,9 +56,9 @@ public final class ProcessingWorker<T1 extends Serializable, T2 extends Serializ
 	public Reporting call() throws Exception {
 		final Reporting reporting = Reporting.newProcessingRepository();
 		Optional<Container<T1>> container = Optional.empty();
-		int waiting = 2;
+		int waiting = 1;
 		do {
-			waiting = (int) Math.max(2, Math.cbrt(incoming.size()));
+			//waiting = (int) Math.max(2, Math.cbrt(incoming.size()));
 			logger.debug("Processor waiting for {} ms", waiting);
 			Thread.sleep(waiting);
 			container = Optional.ofNullable(incoming.pull()).orElseGet(Optional::empty);

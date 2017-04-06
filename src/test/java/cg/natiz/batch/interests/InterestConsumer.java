@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cg.natiz.batch.savings;
+package cg.natiz.batch.interests;
 
 import java.util.Optional;
 
@@ -20,8 +20,8 @@ import cg.natiz.batch.pop.util.ControllerType;
  */
 @SuppressWarnings("serial")
 @Controller(ControllerType.CONSUMER)
-@Savings
-public class Recipient implements Pusher<Long> {
+@Interest
+public class InterestConsumer implements Pusher<Long> {
 
 	@Inject
 	private Logger logger;

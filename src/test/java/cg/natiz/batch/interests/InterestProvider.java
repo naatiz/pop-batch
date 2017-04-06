@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cg.natiz.batch.savings;
+package cg.natiz.batch.interests;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,16 +23,16 @@ import cg.natiz.batch.pop.util.ControllerType;
  */
 @SuppressWarnings("serial")
 @Controller(ControllerType.PROVIDER)
-@Savings
-public class Sender implements Puller<String> {
+@Interest
+public class InterestProvider implements Puller<String> {
 
 	/* maximum number of containers */
-	private final long MAX_CONTAINER_NUMBER = 1000;
+	private static final long MAX_CONTAINER_NUMBER = 1000;
 	/* maximum number of elements inside a container */
-	private final int MAX_CONTAINER_SIZE = 100;
+	private static final int MAX_CONTAINER_SIZE = 1000;
 
 	/* current container number */
-	private final AtomicLong CURRENT_CONTAINER_NUMBER = new AtomicLong(0);
+	private static final AtomicLong CURRENT_CONTAINER_NUMBER = new AtomicLong(0);
 
 	@Inject
 	private Logger logger;
@@ -42,7 +42,7 @@ public class Sender implements Puller<String> {
 	public Optional<Container<String>> pull() throws Exception {
 
 		if (!hasMoreData()) {
-			logger.info("No data anymore ...");
+			logger.info("No data anymore...");
 			return Optional.empty();
 		}
 		Container<String> container = Pop.newInstance(Container.class);
@@ -62,5 +62,4 @@ public class Sender implements Puller<String> {
 	private boolean hasMoreData() {
 		return CURRENT_CONTAINER_NUMBER.get() < MAX_CONTAINER_NUMBER;
 	}
-
 }

@@ -6,5 +6,8 @@ package cg.natiz.batch.pop.util;
  *
  */
 public enum ExecutionOption {
-	NONE, MONITORING, REVIVAL;// Relance / reprise
+	NONE, 
+	MONITORING, 
+	REVIVAL, // Relance / reprise
+	BOTH;// MONITORING and REVIVAL
 }

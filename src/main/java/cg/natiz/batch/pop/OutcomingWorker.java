@@ -44,12 +44,12 @@ class OutcomingWorker<T extends Serializable> implements Callable<Reporting> {
 	public Reporting call() throws Exception {
 		final Reporting reporting = Reporting.newOutcomingRepository();
 		Optional<Container<T>> container = Optional.empty();
-		int waiting = 3;
+		int waiting = 1;
 		do {
 			logger.debug("Consumer waiting for {} ms", waiting);
 			Thread.sleep(waiting);
 			logger.debug("Outcoming stock = {}", outcoming.size());
-			waiting = (int) Math.max(3, Math.cbrt(outcoming.size()));
+			//waiting = (int) Math.max(3, Math.cbrt(outcoming.size()));
 			container = Optional.ofNullable(outcoming.pull()).orElseGet(Optional::empty);
 			container.ifPresent(c -> {
 				c.setReceiptDate(new Date());

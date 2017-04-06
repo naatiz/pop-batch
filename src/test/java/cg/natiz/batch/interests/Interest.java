@@ -1,4 +1,4 @@
-package cg.natiz.batch.savings;
+package cg.natiz.batch.interests;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -14,5 +14,5 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Qualifier
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, FIELD, PARAMETER })
-public @interface Savings {
+public @interface Interest {
 }

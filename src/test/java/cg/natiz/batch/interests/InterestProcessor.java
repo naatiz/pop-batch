@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cg.natiz.batch.savings;
+package cg.natiz.batch.interests;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -22,8 +22,8 @@ import cg.natiz.batch.pop.util.ControllerType;
  */
 @SuppressWarnings("serial")
 @Controller(ControllerType.PROCESSOR)
-@Savings
-public class Behoof implements Processor<String, Long> {
+@Interest
+public class InterestProcessor implements Processor<String, Long> {
 
 	@Inject
 	private Logger logger;

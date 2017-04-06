@@ -1,4 +1,4 @@
-package cg.natiz.batch.savings;
+package cg.natiz.batch.interests;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import cg.natiz.batch.pop.util.Controller;
 import cg.natiz.batch.pop.util.ControllerType;
 import cg.natiz.batch.pop.util.ExecutionOption;
 
-public class PopRunner {
+public class InterestRunner {
 
 	@Inject
 	private Logger logger;
@@ -32,9 +32,9 @@ public class PopRunner {
 
 	@Inject
 	@SuppressWarnings("unchecked")
-	public void initSavings(@Savings @Controller(ControllerType.PROVIDER) final Puller<String> provider,
-			@Savings @Controller(ControllerType.PROCESSOR) final Processor<String, Long> processor,
-			@Savings @Controller(ControllerType.CONSUMER) final Pusher<Long> consumer) {
+	public void init(@Interest @Controller(ControllerType.PROVIDER) final Puller<String> provider,
+			@Interest @Controller(ControllerType.PROCESSOR) final Processor<String, Long> processor,
+			@Interest @Controller(ControllerType.CONSUMER) final Pusher<Long> consumer) {
 
 		this.savings = Pop.newInstance(Pop.class).addConfiguration(popProperties, ExecutionOption.NONE).build(provider,
 				processor, consumer);
@@ -54,9 +54,9 @@ public class PopRunner {
 			throw new IllegalStateException("M or R option parameter is missing!");
 		}
 
-		logger.info("Batch savings starting ... ");
+		logger.info("Interest batch starting ... ");
 		List<Reporting> reportings = savings.start();
 		logger.info("Reportings size: " + reportings.size());
-		logger.info("Batch savings ends successfully!");
+		logger.info("Interest batch ends successfully!");
 	}
 }

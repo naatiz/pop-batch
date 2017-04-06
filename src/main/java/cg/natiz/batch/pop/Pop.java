@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import org.jboss.weld.environment.se.StartMain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,6 +140,18 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 		executorService.shutdown();
 		logger.info("PoP engine ends successfully");
 		return reportings;
+	}
+
+	/**
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public static boolean main(String[] args) {
+		// Revival = relance ou reprise
+		logger.debug("Running options : -M=Monitoring -R=Revival");
+		StartMain.main(new String[] { "-MR" });
+		return true;
 	}
 
 	/**
