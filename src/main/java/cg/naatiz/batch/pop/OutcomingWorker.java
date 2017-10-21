@@ -1,4 +1,4 @@
-package cg.natiz.batch.pop;
+package cg.naatiz.batch.pop;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -8,8 +8,8 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cg.natiz.batch.pop.util.Controller;
-import cg.natiz.batch.pop.util.ControllerType;
+import cg.naatiz.batch.pop.util.Controller;
+import cg.naatiz.batch.pop.util.ControllerType;
 
 /**
  * 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cg.natiz.batch.pop;
+package cg.naatiz.batch.pop;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

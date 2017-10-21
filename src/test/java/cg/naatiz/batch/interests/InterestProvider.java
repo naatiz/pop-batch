@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cg.natiz.batch.interests;
+package cg.naatiz.batch.interests;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -11,11 +11,11 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import cg.natiz.batch.pop.Container;
-import cg.natiz.batch.pop.Pop;
-import cg.natiz.batch.pop.Puller;
-import cg.natiz.batch.pop.util.Controller;
-import cg.natiz.batch.pop.util.ControllerType;
+import cg.naatiz.batch.pop.Container;
+import cg.naatiz.batch.pop.Pop;
+import cg.naatiz.batch.pop.Puller;
+import cg.naatiz.batch.pop.util.Controller;
+import cg.naatiz.batch.pop.util.ControllerType;
 
 /**
  * @author natiz

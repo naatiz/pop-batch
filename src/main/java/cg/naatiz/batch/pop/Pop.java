@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cg.natiz.batch.pop;
+package cg.naatiz.batch.pop;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -30,10 +30,10 @@ import org.jboss.weld.environment.se.StartMain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cg.natiz.batch.pop.util.Controller;
-import cg.natiz.batch.pop.util.ControllerType;
-import cg.natiz.batch.pop.util.ExecutionOption;
-import cg.natiz.batch.pop.util.PopProperties;
+import cg.naatiz.batch.pop.util.Controller;
+import cg.naatiz.batch.pop.util.ControllerType;
+import cg.naatiz.batch.pop.util.ExecutionOption;
+import cg.naatiz.batch.pop.util.PopProperties;
 
 /**
  * 

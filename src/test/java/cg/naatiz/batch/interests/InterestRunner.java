@@ -1,4 +1,4 @@
-package cg.natiz.batch.interests;
+package cg.naatiz.batch.interests;
 
 import java.util.List;
 
@@ -9,15 +9,15 @@ import org.slf4j.Logger;
 import org.jboss.weld.environment.se.bindings.Parameters;
 import org.jboss.weld.environment.se.events.ContainerInitialized;
 
-import cg.natiz.batch.pop.util.PopProperties;
-import cg.natiz.batch.pop.Pop;
-import cg.natiz.batch.pop.Processor;
-import cg.natiz.batch.pop.Puller;
-import cg.natiz.batch.pop.Pusher;
-import cg.natiz.batch.pop.Reporting;
-import cg.natiz.batch.pop.util.Controller;
-import cg.natiz.batch.pop.util.ControllerType;
-import cg.natiz.batch.pop.util.ExecutionOption;
+import cg.naatiz.batch.pop.Pop;
+import cg.naatiz.batch.pop.Processor;
+import cg.naatiz.batch.pop.Puller;
+import cg.naatiz.batch.pop.Pusher;
+import cg.naatiz.batch.pop.Reporting;
+import cg.naatiz.batch.pop.util.Controller;
+import cg.naatiz.batch.pop.util.ControllerType;
+import cg.naatiz.batch.pop.util.ExecutionOption;
+import cg.naatiz.batch.pop.util.PopProperties;
 
 public class InterestRunner {
 

@@ -1,4 +1,4 @@
-package cg.natiz.batch.interests;
+package cg.naatiz.batch.pop.util;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -14,5 +14,6 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Qualifier
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, FIELD, PARAMETER })
-public @interface Interest {
+public @interface Controller {
+	ControllerType value();
 }

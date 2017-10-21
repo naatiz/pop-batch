@@ -1,4 +1,4 @@
-package cg.natiz.batch.interests;
+package cg.naatiz.batch.interests;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cg.natiz.batch.pop.Pop;
+import cg.naatiz.batch.pop.Pop;
 
 public class InterestRunnerTest {
 	private static final Logger logger = LoggerFactory.getLogger(InterestRunnerTest.class);
