@@ -26,9 +26,9 @@ import cg.naatiz.batch.pop.util.ControllerType;
  * @param <T2>
  *            targeted managed data type
  */
-public final class ProcessingWorker<T1 extends Serializable, T2 extends Serializable> implements Callable<Reporting> {
+public final class ProcessorWorker<T1 extends Serializable, T2 extends Serializable> implements Callable<Reporting> {
 
-	private static final Logger logger = LoggerFactory.getLogger(ProcessingWorker.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProcessorWorker.class);
 
 	private Repository<T1> incoming;
 	private Repository<T2> outcoming;
@@ -44,7 +44,7 @@ public final class ProcessingWorker<T1 extends Serializable, T2 extends Serializ
 	 *            outcoming repository
 	 * @return this worker object
 	 */
-	public ProcessingWorker<T1, T2> init(@Controller(ControllerType.PROCESSOR) Processor<T1, T2> processor,
+	public ProcessorWorker<T1, T2> init(@Controller(ControllerType.PROCESSOR) Processor<T1, T2> processor,
 			Repository<T1> incoming, Repository<T2> outcoming) {
 		this.processor = processor;
 		this.incoming = incoming;
@@ -71,7 +71,7 @@ public final class ProcessingWorker<T1 extends Serializable, T2 extends Serializ
 					} catch (Exception e) {
 						String message = String.format("Item processing fails: %s. Problem:  %s -> %S", item,
 								e.getClass().getName(), e.getMessage());
-						reporting.addRapport(message);
+						reporting.addReport(message);
 						logger.warn(message);
 						return empty;
 					}
@@ -90,11 +90,11 @@ public final class ProcessingWorker<T1 extends Serializable, T2 extends Serializ
 					} else {
 						String message = String.format("Pushing to outcoming fails %s \nOutcoming stock = %d", newContainer,
 								outcoming.size());
-						reporting.addRapport(message);
+						reporting.addReport(message);
 						throw new Exception(message);
 					}
 				} catch (Exception e) {
-					reporting.addRapport(e.getMessage());
+					reporting.addReport(e.getMessage());
 					logger.warn("Cannot push container to outcoming repository: " + newContainer, e);
 				}
 			});

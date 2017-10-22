@@ -10,6 +10,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import cg.naatiz.batch.pop.util.ControllerType;
+import cg.naatiz.batch.pop.util.Report;
+
 /**
  * @author natiz
  * 
@@ -22,22 +25,18 @@ public class Reporting implements Serializable {
 	private long containersNumber = 0;
 	private long itemsNumber = 0;
 
-	private enum WorkerType {
-		INCOMING, PROCESSING, OUTCOMING
-	}
-
-	private WorkerType type;
+	private ControllerType type;
 
 	private LocalDateTime startDate = LocalDateTime.now();
 	private LocalDateTime endDate = startDate;
 
-	private List<String> rapports = Lists.newArrayList();
+	private List<Report> reports = Lists.newArrayList();
 
 	/**
 	 * 
 	 * @param type
 	 */
-	private Reporting(WorkerType type) {
+	private Reporting(ControllerType type) {
 		this.type = type;
 	}
 	
@@ -46,7 +45,7 @@ public class Reporting implements Serializable {
 	 * @return
 	 */
 	public static Reporting newIncomingRepository() {
-		return new Reporting(WorkerType.INCOMING).start();
+		return new Reporting(ControllerType.PROVIDER).start();
 	}
 	
 	/**
@@ -54,7 +53,7 @@ public class Reporting implements Serializable {
 	 * @return
 	 */
 	public static Reporting newProcessingRepository() {
-		return new Reporting(WorkerType.PROCESSING).start();
+		return new Reporting(ControllerType.PROCESSOR).start();
 	}
 	
 	/**
@@ -62,11 +61,11 @@ public class Reporting implements Serializable {
 	 * @return
 	 */
 	public static Reporting newOutcomingRepository() {
-		return new Reporting(WorkerType.OUTCOMING).start();
+		return new Reporting(ControllerType.CONSUMER).start();
 	}
 
-	public List<String> getRapports() {
-		return rapports;
+	public List<Report> getReports() {
+		return reports;
 	}
 
 	/**
@@ -74,21 +73,23 @@ public class Reporting implements Serializable {
 	 * @param message
 	 * @return
 	 */
-	public Reporting addRapport(String message) {
-		this.rapports.add(message);
-		if (this.rapports.size() > MAX_RAPPORT_SIZE)
+	public Reporting addReport(String message) {
+		Report report = new Report();
+		report.setMessage(message);
+		this.reports.add(report);
+		if (this.reports.size() > MAX_RAPPORT_SIZE)
 			throw new IllegalStateException("Too many (" + MAX_RAPPORT_SIZE + ") wrong rapports have been generated");
 		return this;
 	}
 
 	@Override
 	public String toString() {
-		String report = String.format("Total time/containers/items: %ds/%d/%d", this.getDuration(),
+		String report = String.format("Total duration/containers/items: %ds/%d/%d", this.getDuration(),
 				this.getContainersNumber(), this.getItemsNumber());
 		return report;
 	}
 
-	public WorkerType getType() {
+	public ControllerType getType() {
 		return type;
 	}
 

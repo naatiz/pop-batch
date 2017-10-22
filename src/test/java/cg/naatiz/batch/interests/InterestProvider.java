@@ -46,14 +46,14 @@ public class InterestProvider implements Puller<String> {
 			return Optional.empty();
 		}
 		Container<String> container = Pop.newInstance(Container.class);
-		String token = null;
+		String amount = null;
 		for (int i = 0; i < MAX_CONTAINER_SIZE; i++) {
-			token = "" + ThreadLocalRandom.current().nextInt(MAX_CONTAINER_SIZE);
+			amount = "" + ThreadLocalRandom.current().nextInt(MAX_CONTAINER_SIZE);
 			if (CURRENT_CONTAINER_NUMBER.get() == 5 && i == 5) {
-				token += "A";
-				logger.warn("Adding wrong data {}, this {} will be rejected", token, container);
+				amount += "A";
+				logger.warn("Adding wrong data {}, this {} will be rejected", amount, container);
 			}
-			container.addItem(token);
+			container.addItem(amount);
 		}
 		CURRENT_CONTAINER_NUMBER.incrementAndGet();
 		return Optional.of(container);

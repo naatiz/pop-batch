@@ -99,19 +99,19 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 		logger.info("Provider worker initializing ... ");
 		int count = popProperties.getProviderWorkerCount();
 		for (int i = 0; i < count; i++) {
-			this.workers.add(Pop.newInstance(IncomingWorker.class).init(provider, incoming));
+			this.workers.add(Pop.newInstance(ProviderWorker.class).init(provider, incoming));
 		}
 
 		logger.info("Processor worker initializing ... ");
 		count = popProperties.getProcessorWorkerCount();
 		for (int i = 0; i < count; i++) {
-			this.workers.add(Pop.newInstance(ProcessingWorker.class).init(processor, incoming, outcoming));
+			this.workers.add(Pop.newInstance(ProcessorWorker.class).init(processor, incoming, outcoming));
 		}
 
 		logger.info("Consumer worker initializing ... ");
 		count = popProperties.getConsumerWorkerCount();
 		for (int i = 0; i < count; i++) {
-			this.workers.add(Pop.newInstance(OutcomingWorker.class).init(consumer, outcoming));
+			this.workers.add(Pop.newInstance(ConsumerWorker.class).init(consumer, outcoming));
 		}
 
 		logger.info("PoP settings {}", popProperties);

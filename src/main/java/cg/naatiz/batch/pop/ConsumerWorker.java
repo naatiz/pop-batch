@@ -20,9 +20,9 @@ import cg.naatiz.batch.pop.util.ControllerType;
  * @param <T>
  *            outcoming managed data type
  */
-class OutcomingWorker<T extends Serializable> implements Callable<Reporting> {
+class ConsumerWorker<T extends Serializable> implements Callable<Reporting> {
 
-	private static final Logger logger = LoggerFactory.getLogger(OutcomingWorker.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConsumerWorker.class);
 
 	private Pusher<T> consumer;
 	private Repository<T> outcoming;
@@ -34,7 +34,7 @@ class OutcomingWorker<T extends Serializable> implements Callable<Reporting> {
 	 *            outcoming repository
 	 * @return this worker object
 	 */
-	public OutcomingWorker<T> init(@Controller(ControllerType.CONSUMER) Pusher<T> consumer, Repository<T> outcoming) {
+	public ConsumerWorker<T> init(@Controller(ControllerType.CONSUMER) Pusher<T> consumer, Repository<T> outcoming) {
 		this.consumer = consumer;
 		this.outcoming = outcoming;
 		return this;
@@ -63,7 +63,7 @@ class OutcomingWorker<T extends Serializable> implements Callable<Reporting> {
 						throw new Exception(message);
 					}
 				} catch (Exception e) {
-					reporting.addRapport(e.getMessage());
+					reporting.addReport(e.getMessage());
 					logger.warn("Cannot push container to consumer: " + c, e);
 				}
 			});
