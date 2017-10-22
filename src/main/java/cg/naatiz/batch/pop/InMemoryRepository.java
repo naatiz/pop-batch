@@ -41,7 +41,7 @@ public class InMemoryRepository<T extends Serializable> implements Repository<T>
 	}
 
 	@Override
-	public void setPushable(boolean pushable) {
+	public void isPushable(boolean pushable) {
 		this.pushable.set(pushable);
 	}
 }

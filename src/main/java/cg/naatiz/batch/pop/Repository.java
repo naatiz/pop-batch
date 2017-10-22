@@ -30,5 +30,5 @@ public interface Repository<T extends Serializable> extends Serializable, Puller
 	 * To allow or not the repository is pushable
 	 * @param pushable true if the repository can be pushed or false
 	 */
-	public  void setPushable(boolean pushable);
+	public  void isPushable(boolean pushable);
 }

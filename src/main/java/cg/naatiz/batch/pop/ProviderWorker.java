@@ -66,7 +66,7 @@ final class ProviderWorker<T extends Serializable> implements Callable<Reporting
 					logger.warn("Cannot push container to incoming repository: " + c, e);
 				}
 			});
-			incoming.setPushable(container.isPresent());
+			incoming.isPushable(container.isPresent());
 		} while (container.isPresent());
 		logger.info("Worker ends successfully. {} ", reporting.stop());
 		currentContainerId = 0L; // Initializing this ID

@@ -98,7 +98,7 @@ public final class ProcessorWorker<T1 extends Serializable, T2 extends Serializa
 					logger.warn("Cannot push container to outcoming repository: " + newContainer, e);
 				}
 			});
-			outcoming.setPushable(incoming.isOpen());
+			outcoming.isPushable(incoming.isOpen());
 		} while (incoming.isOpen());
 		logger.info("Worker ends successfully. {} ", reporting.stop());
 		return reporting;
