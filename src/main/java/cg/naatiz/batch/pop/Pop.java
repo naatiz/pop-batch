@@ -149,8 +149,8 @@ public class Pop<T1 extends Serializable, T2 extends Serializable> implements Se
 	 */
 	public static boolean main(String[] args) {
 		// Revival = relance ou reprise
-		logger.debug("Running options : -M=Monitoring -R=Revival");
-		StartMain.main(new String[] { "-MR" });
+		logger.debug("Args running options : -M=Monitoring -R=Revival");
+		StartMain.main(args);
 		return true;
 	}
 
